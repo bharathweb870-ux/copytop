@@ -31,21 +31,25 @@
 <body class="{{ $bodyClass ?? 'bg-[#1A1A2E] text-white' }}">
 
     {{-- Header --}}
-    @include('components.header')
+    @unless($hideHeader ?? false)
+        @include('components.header')
 
-    {{-- Mobile menu overlay --}}
-    <div class="mobile-menu-overlay" id="mobile-overlay" onclick="closeMobileMenu()"></div>
+        {{-- Mobile menu overlay --}}
+        <div class="mobile-menu-overlay" id="mobile-overlay" onclick="closeMobileMenu()"></div>
 
-    {{-- Mobile menu --}}
-    @include('components.mobile-menu')
+        {{-- Mobile menu --}}
+        @include('components.mobile-menu')
+    @endunless
 
     {{-- Main content --}}
-    <main id="main-content" class="@yield('main-class', isset($heroPage) && $heroPage ? '' : 'pt-24 sm:pt-28')">
+    <main id="main-content" class="@yield('main-class', isset($heroPage) && $heroPage ? '' : (isset($editorPage) && $editorPage ? 'pt-0' : 'pt-24 sm:pt-28'))">
         @yield('content')
     </main>
 
     {{-- Footer --}}
-    @include('components.footer')
+    @unless($hideFooter ?? false)
+        @include('components.footer')
+    @endunless
 
     {{-- Global JS --}}
     <script>

@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.app', ['hideFooter' => true, 'editorPage' => true])
 
 @section('title', 'Studio d\'Édition Graphique en Ligne — Shri Bharathi')
 @section('description', 'Éditeur de création visuelle professionnel en ligne. Personnalisez vos imprimés en direct.')
 
-@section('main-class', 'pt-14 sm:pt-20 pb-0 overflow-hidden')
+@section('main-class', 'pt-0 pb-0 overflow-hidden')
 
 @section('content')
 <main class="bg-gray-950 text-white min-h-[100dvh] flex flex-col w-full max-w-full overflow-hidden select-none" 
