@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const BASE_URL = 'http://127.0.0.1:8000';
-const OUTPUT_DIR = path.join(__dirname, 'frontend-demo', 'public');
+const OUTPUT_DIR = path.join(__dirname, 'dist');
 
 // Known routes to crawl
 const initialRoutes = [

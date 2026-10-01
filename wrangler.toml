@@ -1,5 +1,5 @@
 name = "shri-bharathi"
-pages_build_output_dir = "frontend-demo/public"
+pages_build_output_dir = "dist"
 
 [assets]
-directory = "frontend-demo/public"
+directory = "dist"
