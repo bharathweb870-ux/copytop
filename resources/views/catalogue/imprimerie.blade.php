@@ -36,10 +36,10 @@
 </section>
 
 {{-- Quick nav --}}
-<div style="background:rgba(26, 26, 46, 0.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201, 168, 76, 0.2);position:sticky;top:60px;z-index:100;overflow-x:auto;">
+<div style="background:white;border-bottom:1px solid #F0EBE0;position:sticky;top:80px;z-index:100;overflow-x:auto;">
     <div class="container-sb" style="display:flex;gap:0;white-space:nowrap;">
         @foreach(['Cartes de visite','Flyers','Dépliants','Brochures','Affiches','Menus','Papeterie','Stickers','Billetterie','Tampons'] as $nav)
-        <a href="#{{ Str::slug($nav) }}" style="padding:0.875rem 1rem;color:rgba(255,255,255,0.85);font-size:0.85rem;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;display:inline-block;" class="cat-nav-link">
+        <a href="#{{ Str::slug($nav) }}" style="padding:0.875rem 1rem;color:var(--sb-slate);font-size:0.85rem;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;display:inline-block;" class="cat-nav-link">
             {{ $nav }}
         </a>
         @endforeach
