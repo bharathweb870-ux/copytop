@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="signBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="#eef2ff"/>
+  <rect x="180" y="160" width="440" height="200" rx="16" fill="url(#signBg)" filter="drop-shadow(0 20px 25px rgba(49,46,129,0.25))"/>
+  <text x="400" y="260" text-anchor="middle" fill="#818cf8" font-family="system-ui, sans-serif" font-size="32" font-weight="900" letter-spacing="4">ENSEIGNES &amp; PANNEAUX</text>
+  <text x="400" y="420" text-anchor="middle" fill="#1e1b4b" font-family="system-ui, sans-serif" font-size="20" font-weight="700">Enseignes &amp; Signalétique</text>
+  <text x="400" y="450" text-anchor="middle" fill="#4338ca" font-family="system-ui, sans-serif" font-size="14">Alu Dibond, Plexiglas, Bâches &amp; Roll-up</text>
+</svg>

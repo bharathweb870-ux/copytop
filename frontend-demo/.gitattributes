@@ -1,0 +1,3 @@
+﻿# Enforce LF for all generated assets
+public/build/** text eol=lf
+frontend-demo/public/build/** text eol=lf
