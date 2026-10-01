@@ -1,0 +1,5 @@
+name = "shri-bharathi"
+pages_build_output_dir = "frontend-demo/public"
+
+[assets]
+directory = "frontend-demo/public"
