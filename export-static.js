@@ -6,33 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const BASE_URL = 'http://127.0.0.1:8000';
-const OUTPUT_DIR = path.join(__dirname, 'public');
-
-// --- Read built asset filenames from Vite manifest ---
-const manifestPath = path.join(__dirname, 'public', 'build', 'manifest.json');
-let CSS_FILE = 'app.css';
-let JS_FILE = 'app.js';
-
-try {
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  // Get CSS file from manifest
-  const cssEntry = manifest['resources/css/app.css'];
-  if (cssEntry && cssEntry.file) {
-    CSS_FILE = cssEntry.file; // e.g. "assets/app-DVrTkOGA.css"
-  }
-  // Get JS file from manifest
-  const jsEntry = manifest['resources/js/app.js'];
-  if (jsEntry && jsEntry.file) {
-    JS_FILE = jsEntry.file; // e.g. "assets/app-l0sNRNKZ.js"
-  }
-  console.log(`Using CSS: /build/${CSS_FILE}`);
-  console.log(`Using JS:  /build/${JS_FILE}`);
-} catch (e) {
-  console.warn('Could not read Vite manifest, using fallback filenames.');
-}
-
-const CSS_URL = `/build/${CSS_FILE}`;
-const JS_URL  = `/build/${JS_FILE}`;
+const OUTPUT_DIR = path.join(__dirname, 'dist');
 
 // Known routes to crawl
 const initialRoutes = [
@@ -88,51 +62,8 @@ const initialRoutes = [
 const visited = new Set();
 const queue = [...initialRoutes];
 
-/**
- * Replace all Vite dev-server asset references with production built paths.
- * Handles both local dev (APP_ENV=local) and production (@vite() compiled tags).
- */
-function replaceViteAssets(html) {
-  // Pattern 1: Full Vite HMR block (APP_ENV=local, dev server running)
-  // <script type="module" src="http://[::1]:5173/@vite/client">...demo-data.js">
-  html = html.replace(
-    /<script type="module" src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/@vite\/client"><\/script>[\s\S]*?<script type="module" src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/resources\/js\/demo-data\.js"><\/script>/gi,
-    `<link rel="stylesheet" href="${CSS_URL}">\n    <script type="module" src="${JS_URL}"></script>`
-  );
-
-  // Pattern 2: Vite HMR block WITHOUT demo-data.js (partial match)
-  html = html.replace(
-    /<script type="module" src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/@vite\/client"><\/script>[\s\S]*?<script type="module" src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/resources\/js\/app\.js"><\/script>/gi,
-    `<link rel="stylesheet" href="${CSS_URL}">\n    <script type="module" src="${JS_URL}"></script>`
-  );
-
-  // Pattern 3: Replace individual Vite dev URLs (fallback, any remaining)
-  html = html.replace(
-    /href="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/resources\/css\/app\.css"/gi,
-    `href="${CSS_URL}"`
-  );
-  html = html.replace(
-    /src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/resources\/js\/app\.js"/gi,
-    `src="${JS_URL}"`
-  );
-  html = html.replace(
-    /<script type="module" src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/@vite\/client"><\/script>/gi,
-    ''
-  );
-  html = html.replace(
-    /<script type="module" src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/resources\/js\/demo-data\.js"><\/script>/gi,
-    ''
-  );
-
-  // Pattern 4: Production built @vite() output — already correct, keep as-is
-  // <link rel="stylesheet" href="/build/assets/app-XYZ.css"> ← already fine
-
-  return html;
-}
-
 async function crawl() {
   console.log('Starting crawler for Cloudflare Pages static export...');
-  console.log(`Output dir: ${OUTPUT_DIR}`);
 
   while (queue.length > 0) {
     const route = queue.shift();
@@ -152,7 +83,7 @@ async function crawl() {
       let html = await res.text();
 
       // Find more links inside HTML matching our app
-      const hrefRegex = /href=["'](http:\/\/(?:127\.0\.0\.1|localhost):8000)?(\/[^"']*)['"]/g;
+      const hrefRegex = /href=["'](http:\/\/(?:127\.0\.0\.1|localhost):8000)?(\/[^"']*)["']/g;
       let match;
       while ((match = hrefRegex.exec(html)) !== null) {
         const link = match[2].split('#')[0].split('?')[0];
@@ -163,11 +94,17 @@ async function crawl() {
         }
       }
 
-      // Replace Vite dev assets with production paths
-      html = replaceViteAssets(html);
+      // 1. Replace Vite dev server tags with production assets
+      html = html.replace(
+        /<script type="module" src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/@vite\/client"><\/script>[\s\S]*?<script type="module" src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/resources\/js\/demo-data\.js"><\/script>/gi,
+        '<link rel="stylesheet" href="/build/assets/app-DVrTkOGA.css">\n    <script type="module" src="/build/assets/app-l0sNRNKZ.js"></script>'
+      );
+      html = html.replace(/http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/resources\/css\/app\.css/g, '/build/assets/app-DVrTkOGA.css');
+      html = html.replace(/http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/resources\/js\/app\.js/g, '/build/assets/app-l0sNRNKZ.js');
+      html = html.replace(/<script type="module" src="http:\/\/(?:\[::1\]|localhost|127\.0\.0\.1):5173\/@vite\/client"><\/script>/gi, '');
 
-      // Replace localhost & 127.0.0.1 URLs with clean production paths
-      html = html.replace(/href=["']http:\/\/(?:127\.0\.0\.1|localhost):8000\/?['"]/g, 'href="/"');
+      // 2. Replace localhost & 127.0.0.1 URLs with clean production relative/absolute paths
+      html = html.replace(/href=["']http:\/\/(?:127\.0\.0\.1|localhost):8000\/?["']/g, 'href="/"');
       html = html.replace(/http:\/\/(?:127\.0\.0\.1|localhost):8000/g, '');
       html = html.replace(/href=""/g, 'href="/"');
 
@@ -183,15 +120,13 @@ async function crawl() {
       }
 
       fs.writeFileSync(filePath, html, 'utf8');
-      console.log(`  Saved: ${filePath}`);
+      console.log(` Saved: ${filePath}`);
     } catch (err) {
-      console.error(`  Error fetching ${route}:`, err.message);
+      console.error(` Error fetching ${route}:`, err.message);
     }
   }
 
   console.log(`\nCrawl complete! ${visited.size} pages exported to ${OUTPUT_DIR}`);
-  console.log('\nIMPORTANT: Make sure public/build/ folder has the latest CSS/JS assets!');
-  console.log('Run "npm run build" if not already built.');
 }
 
 crawl();
