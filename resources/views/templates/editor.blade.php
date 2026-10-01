@@ -44,10 +44,10 @@
     </header>
 
     <!-- Main Workspace Grid -->
-    <div class="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden w-full max-w-full">
+    <div class="editor-workspace flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden w-full max-w-full">
         
         <!-- Left Toolbar -->
-        <aside class="w-full lg:w-20 bg-gray-900 border-b lg:border-b-0 lg:border-r border-gray-800 flex flex-row lg:flex-col items-center justify-around lg:justify-start py-2 lg:py-4 px-2 lg:px-0 space-x-1 lg:space-x-0 lg:space-y-6 text-xs text-gray-400 select-none flex-shrink-0">
+        <aside class="editor-left-tools w-full lg:w-20 bg-gray-900 border-b lg:border-b-0 lg:border-r border-gray-800 flex flex-row lg:flex-col items-center justify-around lg:justify-start py-2 lg:py-4 px-2 lg:px-0 space-x-1 lg:space-x-0 lg:space-y-6 text-xs text-gray-400 select-none flex-shrink-0">
             <button @click="activeTab = 'text'" :class="{'text-brand-orange bg-gray-800': activeTab === 'text'}" class="w-12 h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl flex flex-col items-center justify-center hover:bg-gray-800 hover:text-white transition">
                 <svg class="w-5 h-5 mb-0.5 lg:mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"/></svg>
                 <span class="text-[10px]">Texte</span>
@@ -67,7 +67,7 @@
         </aside>
 
         <!-- Tool Subpanel (Active Tab Settings) -->
-        <div class="w-full lg:w-64 bg-gray-900/90 border-b lg:border-b-0 lg:border-r border-gray-800 p-3 lg:p-4 space-y-3 lg:space-y-4 text-xs select-none flex-shrink-0">
+        <div class="editor-tool-options w-full lg:w-64 bg-gray-900/90 border-b lg:border-b-0 lg:border-r border-gray-800 p-3 lg:p-4 space-y-3 lg:space-y-4 text-xs select-none flex-shrink-0">
             <h3 class="font-bold text-gray-200 uppercase tracking-wider text-[11px]" x-text="'Outil : ' + activeTab"></h3>
             
             <div x-show="activeTab === 'text'" class="grid grid-cols-3 lg:grid-cols-1 gap-2 lg:gap-3">
@@ -94,7 +94,7 @@
         </div>
 
         <!-- Center Interactive Studio Canvas Area -->
-        <section class="flex-1 bg-gray-950 p-4 sm:p-8 flex items-center justify-center overflow-auto relative min-h-[380px] w-full max-w-full">
+        <section class="editor-main-canvas flex-1 bg-gray-950 p-4 sm:p-8 flex items-center justify-center overflow-auto relative min-h-[380px] w-full max-w-full">
             <!-- Canvas Container -->
             <div class="relative bg-white shadow-2xl transition-all duration-300 border border-gray-800 rounded-lg overflow-hidden select-none max-w-full"
                  :style="'width: min(550px, 92vw); height: min(350px, 60vw); background-color: ' + canvasBg + '; transform: scale(' + (zoom/100) + ')'">
@@ -119,7 +119,7 @@
         </section>
 
         <!-- Right Properties Sidebar -->
-        <aside class="w-full lg:w-72 bg-gray-900 border-t lg:border-t-0 lg:border-l border-gray-800 p-4 lg:p-5 space-y-4 lg:space-y-6 text-xs flex-shrink-0">
+        <aside class="editor-properties-panel w-full lg:w-72 bg-gray-900 border-t lg:border-t-0 lg:border-l border-gray-800 p-4 lg:p-5 space-y-4 lg:space-y-6 text-xs flex-shrink-0">
             <h3 class="font-bold text-white uppercase tracking-wider text-[11px] pb-2 border-b border-gray-800">Propriétés de l'Élément</h3>
 
             <template x-if="selectedElementIndex !== null">
