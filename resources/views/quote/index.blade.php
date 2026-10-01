@@ -3,8 +3,9 @@
 @section('title', 'Demande de Devis Sur-Mesure — Shri Bharathi')
 @section('description', 'Obtenez une étude gratuite et personnalisée sous 24h pour vos projets d\'enseignes, imprimerie et signalétique.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-900 text-white min-h-screen py-12" x-data="quoteWizard()">
+<main class="bg-gray-900 text-white min-h-screen pt-24 sm:pt-28 pb-12" x-data="quoteWizard()">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="text-center mb-10">

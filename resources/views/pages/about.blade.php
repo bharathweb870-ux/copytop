@@ -3,8 +3,9 @@
 @section('title', 'À Propos — Shri Bharathi Impression & Signalétique')
 @section('description', 'Découvrez l\'histoire de Shri Bharathi, nos ateliers d\'impression et d\'usinage d\'enseignes, notre parc machine haute technologie.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-50 min-h-screen py-12">
+<main class="bg-gray-50 min-h-screen pt-24 sm:pt-28 pb-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
         <!-- Hero Header -->

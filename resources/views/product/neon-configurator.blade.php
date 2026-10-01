@@ -1,10 +1,11 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
-@section('title', 'Configurateur Néon LED Sur-Mesure — Shri Bharathi')
-@section('description', 'Créez et visualisez votre néon LED personnalisé en direct avec notre outil 3D. Choisissez votre texte, couleur, police et fond mur.')
+@section('title', 'Configurateur NÃ©on LED Sur-Mesure â€” Shri Bharathi')
+@section('description', 'CrÃ©ez et visualisez votre nÃ©on LED personnalisÃ© en direct avec notre outil 3D. Choisissez votre texte, couleur, police et fond mur.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-950 text-white min-h-screen py-8" x-data="neonConfigurator()">
+<main class="bg-gray-950 text-white min-h-screen pt-24 sm:pt-28 pb-8" x-data="neonConfigurator()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Header title -->
@@ -15,15 +16,15 @@
                     <span>/</span>
                     <a href="{{ route('category.enseignes') }}" class="hover:text-white">Enseignes</a>
                     <span>/</span>
-                    <span class="text-brand-orange font-medium">Configurateur Néon 3D</span>
+                    <span class="text-brand-orange font-medium">Configurateur NÃ©on 3D</span>
                 </nav>
                 <h1 class="text-2xl sm:text-4xl font-extrabold text-white flex items-center space-x-3">
-                    <span>⚡ Studio Néon LED Sur-Mesure</span>
-                    <span class="text-xs font-bold bg-brand-orange text-white px-2.5 py-1 rounded-full uppercase tracking-wider">Temps Réel</span>
+                    <span>âš¡ Studio NÃ©on LED Sur-Mesure</span>
+                    <span class="text-xs font-bold bg-brand-orange text-white px-2.5 py-1 rounded-full uppercase tracking-wider">Temps RÃ©el</span>
                 </h1>
             </div>
             <div class="mt-4 md:mt-0 flex items-center space-x-4">
-                <span class="text-xs text-gray-400">⚡ Tubes Silicone Flex LED IP65 (50,000 hrs)</span>
+                <span class="text-xs text-gray-400">âš¡ Tubes Silicone Flex LED IP65 (50,000 hrs)</span>
             </div>
         </div>
 
@@ -59,7 +60,7 @@
                 <!-- Features list under preview -->
                 <div class="grid grid-cols-3 gap-4 text-center text-xs text-gray-400">
                     <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl">
-                        <div class="text-white font-bold">Variateur Télécommande</div>
+                        <div class="text-white font-bold">Variateur TÃ©lÃ©commande</div>
                         <div class="text-[10px]">Inclus gratuitement</div>
                     </div>
                     <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl">
@@ -85,7 +86,7 @@
 
                     <!-- Color Picker -->
                     <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">2. Couleur du Néon LED (10 Teintes)</label>
+                        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">2. Couleur du NÃ©on LED (10 Teintes)</label>
                         <div class="grid grid-cols-5 gap-3">
                             <template x-for="c in colors" :key="c.id">
                                 <button @click="selectedColor = c.id" :class="{'ring-2 ring-white scale-110': selectedColor === c.id}" class="h-10 rounded-xl border border-gray-700 transition flex items-center justify-center relative shadow-lg" :style="'background-color: ' + c.hex" :title="c.name">
@@ -110,7 +111,7 @@
                     <!-- Size Slider -->
                     <div class="space-y-2">
                         <div class="flex justify-between text-xs font-bold text-gray-300 uppercase">
-                            <span>4. Largeur souhaitée</span>
+                            <span>4. Largeur souhaitÃ©e</span>
                             <span class="text-amber-400 font-extrabold" x-text="widthCm + ' cm'"></span>
                         </div>
                         <input type="range" min="40" max="220" step="10" x-model="widthCm" class="w-full accent-brand-orange bg-gray-800 h-2 rounded-lg cursor-pointer">
@@ -118,13 +119,13 @@
 
                     <!-- Backing Support -->
                     <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">5. Découpe du Support Acrylique</label>
+                        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">5. DÃ©coupe du Support Acrylique</label>
                         <div class="grid grid-cols-2 gap-2">
                             <button @click="selectedBacking = 'contour'" :class="{'border-brand-orange bg-brand-orange/20 text-white font-bold': selectedBacking === 'contour', 'border-gray-800 bg-gray-950 text-gray-400': selectedBacking !== 'contour'}" class="py-2 px-3 rounded-xl border text-xs text-center transition">
-                                ✂️ Découpé à la forme du texte
+                                âœ‚ï¸ DÃ©coupÃ© Ã  la forme du texte
                             </button>
                             <button @click="selectedBacking = 'rect'" :class="{'border-brand-orange bg-brand-orange/20 text-white font-bold': selectedBacking === 'rect', 'border-gray-800 bg-gray-950 text-gray-400': selectedBacking !== 'rect'}" class="py-2 px-3 rounded-xl border text-xs text-center transition">
-                                ⏹️ Rectangle Acrylique Réfléchissant
+                                â¹ï¸ Rectangle Acrylique RÃ©flÃ©chissant
                             </button>
                         </div>
                     </div>
@@ -133,11 +134,11 @@
                     <div class="bg-gray-950 p-6 rounded-2xl border border-gray-800 space-y-4">
                         <div class="flex justify-between items-end">
                             <div>
-                                <span class="text-[10px] text-gray-400 uppercase tracking-widest">Tarif Total Néon sur-mesure</span>
+                                <span class="text-[10px] text-gray-400 uppercase tracking-widest">Tarif Total NÃ©on sur-mesure</span>
                                 <div class="text-3xl font-extrabold text-amber-400 mt-0.5">
-                                    <span x-text="calculatedPrice"></span> € <span class="text-xs text-gray-400 font-normal">HT</span>
+                                    <span x-text="calculatedPrice"></span> â‚¬ <span class="text-xs text-gray-400 font-normal">HT</span>
                                 </div>
-                                <div class="text-xs text-gray-400">Expédition sous 5 à 7 jours ouvrés</div>
+                                <div class="text-xs text-gray-400">ExpÃ©dition sous 5 Ã  7 jours ouvrÃ©s</div>
                             </div>
                         </div>
 
@@ -165,12 +166,12 @@ function neonConfigurator() {
         selectedBacking: 'contour',
 
         colors: [
-            { id: 'pink', name: 'Néon Rose', hex: '#ff2a8d', glow: '0 0 10px #ff2a8d, 0 0 20px #ff2a8d, 0 0 40px #ff2a8d' },
-            { id: 'blue', name: 'Bleu Électrique', hex: '#00d2ff', glow: '0 0 10px #00d2ff, 0 0 20px #00d2ff, 0 0 40px #00d2ff' },
+            { id: 'pink', name: 'NÃ©on Rose', hex: '#ff2a8d', glow: '0 0 10px #ff2a8d, 0 0 20px #ff2a8d, 0 0 40px #ff2a8d' },
+            { id: 'blue', name: 'Bleu Ã‰lectrique', hex: '#00d2ff', glow: '0 0 10px #00d2ff, 0 0 20px #00d2ff, 0 0 40px #00d2ff' },
             { id: 'amber', name: 'Jaune Or', hex: '#ffaa00', glow: '0 0 10px #ffaa00, 0 0 20px #ffaa00, 0 0 40px #ffaa00' },
-            { id: 'green', name: 'Vert Émeraude', hex: '#00ff88', glow: '0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 40px #00ff88' },
+            { id: 'green', name: 'Vert Ã‰meraude', hex: '#00ff88', glow: '0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 40px #00ff88' },
             { id: 'red', name: 'Rouge Enseigne', hex: '#ff0033', glow: '0 0 10px #ff0033, 0 0 20px #ff0033, 0 0 40px #ff0033' },
-            { id: 'purple', name: 'Violet Néon', hex: '#aa00ff', glow: '0 0 10px #aa00ff, 0 0 20px #aa00ff, 0 0 40px #aa00ff' },
+            { id: 'purple', name: 'Violet NÃ©on', hex: '#aa00ff', glow: '0 0 10px #aa00ff, 0 0 20px #aa00ff, 0 0 40px #aa00ff' },
             { id: 'cyan', name: 'Cyan Glacier', hex: '#00ffff', glow: '0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff' },
             { id: 'white', name: 'Blanc Pur', hex: '#ffffff', glow: '0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 40px #ffffff' },
             { id: 'warmwhite', name: 'Blanc Chaud 3000K', hex: '#ffe6a8', glow: '0 0 10px #ffe6a8, 0 0 20px #ffe6a8, 0 0 40px #ffe6a8' },
@@ -187,7 +188,7 @@ function neonConfigurator() {
         backgrounds: [
             { id: 'brick', name: 'Briques Sombre', img: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80' },
             { id: 'wood', name: 'Bois Noir Premium', img: 'https://images.unsplash.com/photo-1546484475-7f7bd55792da?auto=format&fit=crop&w=800&q=80' },
-            { id: 'concrete', name: 'Béton Lissé', img: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?auto=format&fit=crop&w=800&q=80' }
+            { id: 'concrete', name: 'BÃ©ton LissÃ©', img: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?auto=format&fit=crop&w=800&q=80' }
         ],
 
         get activeColorHex() {
@@ -201,7 +202,7 @@ function neonConfigurator() {
         },
 
         get selectedBackingName() {
-            return this.selectedBacking === 'contour' ? 'Découpé à la forme' : 'Panneau Rectangulaire';
+            return this.selectedBacking === 'contour' ? 'DÃ©coupÃ© Ã  la forme' : 'Panneau Rectangulaire';
         },
 
         get neonTextStyle() {
@@ -222,7 +223,7 @@ function neonConfigurator() {
         },
 
         addToCart() {
-            alert('Votre Néon "' + this.text + '" de ' + this.widthCm + 'cm a été ajouté au panier ! Total: ' + this.calculatedPrice + '€ HT.');
+            alert('Votre NÃ©on "' + this.text + '" de ' + this.widthCm + 'cm a Ã©tÃ© ajoutÃ© au panier ! Total: ' + this.calculatedPrice + 'â‚¬ HT.');
             window.location.href = "{{ route('cart') }}";
         }
     }

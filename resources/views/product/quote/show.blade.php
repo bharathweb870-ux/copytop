@@ -1,17 +1,18 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
-@section('title', 'Enseigne & Lettrage 3D Sur-Mesure — Shri Bharathi')
-@section('description', 'Demandez votre devis personnalisé pour enseigne lumineuse, lettres relief 3D, panneau Dibond et habillage de devanture.')
+@section('title', 'Enseigne & Lettrage 3D Sur-Mesure â€” Shri Bharathi')
+@section('description', 'Demandez votre devis personnalisÃ© pour enseigne lumineuse, lettres relief 3D, panneau Dibond et habillage de devanture.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-900 text-white py-12" x-data="quoteProductForm()">
+<main class="bg-gray-900 text-white pt-24 sm:pt-28 pb-12" x-data="quoteProductForm()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Breadcrumb -->
         <nav class="flex items-center space-x-2 text-xs text-gray-400 mb-8">
             <a href="{{ route('home') }}" class="hover:text-white transition">Accueil</a>
             <span>/</span>
-            <a href="{{ route('category.enseignes') }}" class="hover:text-white transition">Enseignes & Signalétique</a>
+            <a href="{{ route('category.enseignes') }}" class="hover:text-white transition">Enseignes & SignalÃ©tique</a>
             <span>/</span>
             <span class="text-brand-orange font-medium">Sur-Mesure & Pose</span>
         </nav>
@@ -24,17 +25,17 @@
                     <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent"></div>
                     <div class="absolute bottom-6 left-6 right-6 bg-gray-900/90 backdrop-blur-md p-4 rounded-xl border border-gray-700">
                         <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">Sur Devis Unique</span>
-                        <h2 class="text-lg font-bold text-white">Lettrage Boîtier 3D Rétro-Éclairé LED</h2>
-                        <p class="text-xs text-gray-400 mt-1">Conception vectorielle, découpe numérique 5 axes et pose agréée sur façade.</p>
+                        <h2 class="text-lg font-bold text-white">Lettrage BoÃ®tier 3D RÃ©tro-Ã‰clairÃ© LED</h2>
+                        <p class="text-xs text-gray-400 mt-1">Conception vectorielle, dÃ©coupe numÃ©rique 5 axes et pose agrÃ©Ã©e sur faÃ§ade.</p>
                     </div>
                 </div>
 
                 <!-- Process Steps -->
                 <div class="bg-gray-800/60 border border-gray-700 rounded-2xl p-6 space-y-4">
-                    <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Comment se déroule votre projet sur-mesure ?</h3>
+                    <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Comment se dÃ©roule votre projet sur-mesure ?</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                         <div class="space-y-1">
-                            <div class="text-brand-orange font-bold">1. Étude & Devis sous 24h</div>
+                            <div class="text-brand-orange font-bold">1. Ã‰tude & Devis sous 24h</div>
                             <div class="text-gray-400">Simulation tarifaire et validation des dimensions.</div>
                         </div>
                         <div class="space-y-1">
@@ -43,7 +44,7 @@
                         </div>
                         <div class="space-y-1">
                             <div class="text-brand-orange font-bold">3. Fabrication & Pose</div>
-                            <div class="text-gray-400">Usinage dans nos ateliers et installation sécurisée.</div>
+                            <div class="text-gray-400">Usinage dans nos ateliers et installation sÃ©curisÃ©e.</div>
                         </div>
                     </div>
                 </div>
@@ -53,19 +54,19 @@
             <div class="lg:col-span-6">
                 <div class="bg-gray-800/90 border border-gray-700 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
                     <div>
-                        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Formulaire Devis Instantané</span>
-                        <h1 class="text-2xl font-extrabold text-white mt-1">Spécifiez les dimensions de votre Enseigne</h1>
-                        <p class="text-gray-400 text-xs mt-1">Obtenez une première fourchette budgétaire automatique avant validation par notre bureau d'études.</p>
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Formulaire Devis InstantanÃ©</span>
+                        <h1 class="text-2xl font-extrabold text-white mt-1">SpÃ©cifiez les dimensions de votre Enseigne</h1>
+                        <p class="text-gray-400 text-xs mt-1">Obtenez une premiÃ¨re fourchette budgÃ©taire automatique avant validation par notre bureau d'Ã©tudes.</p>
                     </div>
 
                     <!-- Material selection -->
                     <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-300 uppercase">Matériau de structure</label>
+                        <label class="block text-xs font-bold text-gray-300 uppercase">MatÃ©riau de structure</label>
                         <select x-model="material" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-xs text-white focus:border-brand-orange outline-none">
-                            <option value="dibond">Aluminium Dibond 3mm (Ultra résistant)</option>
-                            <option value="pvc">PVC Housse 10mm (Léger & Économique)</option>
-                            <option value="plexis">Plexiglas Coulé PMMA (Brillance Cristal)</option>
-                            <option value="laiton">Laiton Poli / Inox Brossé Prestige</option>
+                            <option value="dibond">Aluminium Dibond 3mm (Ultra rÃ©sistant)</option>
+                            <option value="pvc">PVC Housse 10mm (LÃ©ger & Ã‰conomique)</option>
+                            <option value="plexis">Plexiglas CoulÃ© PMMA (Brillance Cristal)</option>
+                            <option value="laiton">Laiton Poli / Inox BrossÃ© Prestige</option>
                         </select>
                     </div>
 
@@ -83,16 +84,16 @@
 
                     <!-- Lighting mode -->
                     <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-300 uppercase">Éclairage LED</label>
+                        <label class="block text-xs font-bold text-gray-300 uppercase">Ã‰clairage LED</label>
                         <div class="grid grid-cols-3 gap-2">
                             <button @click="lighting = 'none'" :class="{'border-brand-orange bg-brand-orange/20 text-brand-orange font-bold': lighting === 'none', 'border-gray-700 bg-gray-900 text-gray-400': lighting !== 'none'}" class="py-2.5 rounded-xl text-xs border transition">
-                                Non éclairé
+                                Non Ã©clairÃ©
                             </button>
                             <button @click="lighting = 'direct'" :class="{'border-brand-orange bg-brand-orange/20 text-brand-orange font-bold': lighting === 'direct', 'border-gray-700 bg-gray-900 text-gray-400': lighting !== 'direct'}" class="py-2.5 rounded-xl text-xs border transition">
                                 Face Lumineuse
                             </button>
                             <button @click="lighting = 'retro'" :class="{'border-brand-orange bg-brand-orange/20 text-brand-orange font-bold': lighting === 'retro', 'border-gray-700 bg-gray-900 text-gray-400': lighting !== 'retro'}" class="py-2.5 rounded-xl text-xs border transition">
-                                Rétro-éclairé 3D
+                                RÃ©tro-Ã©clairÃ© 3D
                             </button>
                         </div>
                     </div>
@@ -101,21 +102,21 @@
                     <div class="flex items-center space-x-3 bg-gray-900/60 p-3 rounded-xl border border-gray-700/60">
                         <input type="checkbox" x-model="needInstallation" id="install" class="w-4 h-4 text-brand-orange rounded bg-gray-800 border-gray-700 focus:ring-brand-orange">
                         <label for="install" class="text-xs text-gray-300 font-medium cursor-pointer">
-                            Je souhaite une installation sur site par une équipe certifiée Shri Bharathi
+                            Je souhaite une installation sur site par une Ã©quipe certifiÃ©e Shri Bharathi
                         </label>
                     </div>
 
                     <!-- Estimation Range Box -->
                     <div class="bg-gray-950 p-6 rounded-2xl border border-amber-500/30 text-center space-y-2">
-                        <span class="text-[10px] text-amber-400 uppercase tracking-widest">Estimation Budgétaire Indicative</span>
+                        <span class="text-[10px] text-amber-400 uppercase tracking-widest">Estimation BudgÃ©taire Indicative</span>
                         <div class="text-3xl font-extrabold text-amber-400">
-                            <span x-text="estimatedMin"></span> € — <span x-text="estimatedMax"></span> € <span class="text-xs text-gray-400 font-normal">HT</span>
+                            <span x-text="estimatedMin"></span> â‚¬ â€” <span x-text="estimatedMax"></span> â‚¬ <span class="text-xs text-gray-400 font-normal">HT</span>
                         </div>
-                        <p class="text-[10px] text-gray-400">Calcul basé sur la surface de <span x-text="(width * height / 10000).toFixed(2)" class="font-bold text-white"></span> m².</p>
+                        <p class="text-[10px] text-gray-400">Calcul basÃ© sur la surface de <span x-text="(width * height / 10000).toFixed(2)" class="font-bold text-white"></span> mÂ².</p>
                     </div>
 
                     <a href="{{ route('quote') }}?type=enseigne-sur-mesure" class="w-full py-4 bg-brand-orange hover:bg-orange-600 text-white font-extrabold text-sm rounded-xl transition text-center shadow-lg shadow-brand-orange/30 block">
-                        Transmettre ce projet au Bureau d'Études
+                        Transmettre ce projet au Bureau d'Ã‰tudes
                     </a>
                 </div>
             </div>

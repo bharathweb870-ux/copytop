@@ -1,10 +1,11 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Modèles & Templates Prêts à l\'Emploi — Shri Bharathi')
 @section('description', 'Parcourez nos 500+ modèles graphiques gratuits pour cartes de visite, faire-part de mariage, flyers, brochures et menus de restaurant.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-50 min-h-screen py-10" x-data="{ activeCategory: 'all', searchQuery: '' }">
+<main class="bg-gray-50 min-h-screen pt-24 sm:pt-28 pb-10" x-data="{ activeCategory: 'all', searchQuery: '' }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Header -->

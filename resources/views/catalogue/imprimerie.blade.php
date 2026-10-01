@@ -4,7 +4,7 @@
 @section('description', 'Impression professionnelle : cartes de visite, flyers, dépliants, brochures, affiches, menus, stickers et papeterie d\'entreprise. Qualité premium, livraison express.')
 
 @section('content')
-<div class="pt-16 sm:pt-20">
+<div>
 
 {{-- Category Hero --}}
 <section style="background:linear-gradient(135deg,#1A1A2E,#16213E,#0F3460);padding:3rem 0 2.5rem;">
@@ -36,7 +36,7 @@
 </section>
 
 {{-- Quick nav --}}
-<div style="background:white;border-bottom:1px solid #F0EBE0;position:sticky;top:80px;z-index:100;overflow-x:auto;">
+<div class="sticky-subnav" style="background:white;border-bottom:1px solid #F0EBE0;overflow-x:auto;">
     <div class="container-sb" style="display:flex;gap:0;white-space:nowrap;">
         @foreach(['Cartes de visite','Flyers','Dépliants','Brochures','Affiches','Menus','Papeterie','Stickers','Billetterie','Tampons'] as $nav)
         <a href="#{{ Str::slug($nav) }}" style="padding:0.875rem 1rem;color:var(--sb-slate);font-size:0.85rem;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;display:inline-block;" class="cat-nav-link">

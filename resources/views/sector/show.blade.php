@@ -2,8 +2,9 @@
 
 @section('title', 'Pack Communication ' . ucfirst($sector) . ' — Shri Bharathi')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-50 min-h-screen py-12">
+<main class="bg-gray-50 min-h-screen pt-24 sm:pt-28 pb-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <nav class="flex items-center space-x-2 text-xs text-gray-500 mb-6">

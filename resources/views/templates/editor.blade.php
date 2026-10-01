@@ -3,8 +3,9 @@
 @section('title', 'Studio d\'Édition Graphique en Ligne — Shri Bharathi')
 @section('description', 'Éditeur de création visuelle professionnel en ligne. Personnalisez vos imprimés en direct.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-950 text-white min-h-[calc(100vh-4rem)] flex flex-col" x-data="graphicEditor()">
+<main class="bg-gray-950 text-white min-h-screen flex flex-col" x-data="graphicEditor()">
     <!-- Editor Top Action Bar -->
     <header class="bg-gray-900 border-b border-gray-800 px-3 py-2 sm:px-4 sm:py-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 z-20 max-w-full overflow-hidden">
         <div class="flex items-center space-x-2 sm:space-x-4">

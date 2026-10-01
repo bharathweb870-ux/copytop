@@ -1,16 +1,17 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
-@section('title', 'Faire-Part Dorure à Chaud Luxe — Shri Bharathi')
-@section('description', 'Faire-part de mariage personnalisé avec dorure à chaud, velours et calligraphie sur-mesure.')
+@section('title', 'Faire-Part Dorure Ã  Chaud Luxe â€” Shri Bharathi')
+@section('description', 'Faire-part de mariage personnalisÃ© avec dorure Ã  chaud, velours et calligraphie sur-mesure.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-amber-50/20 text-stone-900 py-12" x-data="{ selectedColor: 'gold', sampleQty: 50 }">
+<main class="bg-amber-50/20 text-stone-900 pt-24 sm:pt-28 pb-12" x-data="{ selectedColor: 'gold', sampleQty: 50 }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <nav class="flex items-center space-x-2 text-xs text-stone-500 mb-8">
             <a href="{{ route('home') }}" class="hover:text-amber-600 transition">Accueil</a>
             <span>/</span>
-            <a href="{{ route('category.mariage') }}" class="hover:text-amber-600 transition">Mariage & Événements</a>
+            <a href="{{ route('category.mariage') }}" class="hover:text-amber-600 transition">Mariage & Ã‰vÃ©nements</a>
             <span>/</span>
             <span class="text-stone-900 font-medium">Faire-Part Dorure Prestige</span>
         </nav>
@@ -21,8 +22,8 @@
                 <div class="bg-white rounded-3xl p-6 border border-stone-200 shadow-md relative overflow-hidden group">
                     <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80" alt="Faire part de mariage" class="w-full h-[450px] object-cover rounded-2xl group-hover:scale-105 transition duration-700">
                     <div class="absolute bottom-10 left-10 right-10 bg-stone-900/85 backdrop-blur-md p-4 rounded-xl border border-amber-400/30 text-white">
-                        <div class="text-xs text-amber-400 font-bold uppercase tracking-wider">Finition Étoile</div>
-                        <div class="text-sm font-serif">Papier Coton 350g, Dorure à chaud Or Rose 24K & Enveloppe Velours</div>
+                        <div class="text-xs text-amber-400 font-bold uppercase tracking-wider">Finition Ã‰toile</div>
+                        <div class="text-sm font-serif">Papier Coton 350g, Dorure Ã  chaud Or Rose 24K & Enveloppe Velours</div>
                     </div>
                 </div>
             </div>
@@ -32,8 +33,8 @@
                 <div class="bg-white rounded-3xl p-8 border border-stone-200 shadow-xl space-y-6">
                     <div>
                         <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">Collection Couture Mariage</span>
-                        <h1 class="text-3xl font-serif font-bold text-stone-900 mt-1">Faire-Part Dorure à Chaud & Coton 350g</h1>
-                        <p class="text-xs text-stone-500 mt-2">Équilibre parfait entre tradition typographique et luxe contemporain.</p>
+                        <h1 class="text-3xl font-serif font-bold text-stone-900 mt-1">Faire-Part Dorure Ã  Chaud & Coton 350g</h1>
+                        <p class="text-xs text-stone-500 mt-2">Ã‰quilibre parfait entre tradition typographique et luxe contemporain.</p>
                     </div>
 
                     <!-- Color finish theme -->
@@ -48,8 +49,8 @@
 
                     <div class="pt-4 border-t border-stone-100 flex items-center justify-between">
                         <div>
-                            <span class="text-xs text-stone-500">Prix unitaire estimé</span>
-                            <div class="text-2xl font-serif font-bold text-stone-900">2,50 € <span class="text-xs font-normal text-stone-500">/ pièce</span></div>
+                            <span class="text-xs text-stone-500">Prix unitaire estimÃ©</span>
+                            <div class="text-2xl font-serif font-bold text-stone-900">2,50 â‚¬ <span class="text-xs font-normal text-stone-500">/ piÃ¨ce</span></div>
                         </div>
                         <a href="{{ route('editor', 'mariage-dorure') }}" class="px-6 py-3.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs rounded-xl shadow-lg transition">
                             Personnaliser mon texte

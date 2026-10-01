@@ -1,10 +1,11 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
-@section('title', 'Votre Panier d\'Achat — Shri Bharathi')
-@section('description', 'Récapitulatif de votre commande et validation de vos fichiers d\'impression.')
+@section('title', 'Votre Panier d\'Achat â€” Shri Bharathi')
+@section('description', 'RÃ©capitulatif de votre commande et validation de vos fichiers d\'impression.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-50 min-h-screen py-10" x-data="cartManager()">
+<main class="bg-gray-50 min-h-screen pt-24 sm:pt-28 pb-10" x-data="cartManager()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <h1 class="text-3xl font-extrabold text-gray-900 mb-8">Votre Panier de Commande</h1>
@@ -28,15 +29,15 @@
                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                         Fichier BAT Conforme
                                     </span>
-                                    <span class="text-gray-400">| Expédition : 48h</span>
+                                    <span class="text-gray-400">| ExpÃ©dition : 48h</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex items-center justify-between sm:justify-end sm:space-x-6 pt-4 sm:pt-0 border-t sm:border-0 border-gray-100">
                             <div class="text-right">
-                                <div class="text-lg font-extrabold text-gray-900" x-text="item.price + ' € HT'"></div>
-                                <div class="text-[10px] text-gray-400">Qté : <span x-text="item.qty" class="font-bold"></span></div>
+                                <div class="text-lg font-extrabold text-gray-900" x-text="item.price + ' â‚¬ HT'"></div>
+                                <div class="text-[10px] text-gray-400">QtÃ© : <span x-text="item.qty" class="font-bold"></span></div>
                             </div>
                             <button @click="removeItem(index)" class="text-gray-400 hover:text-red-600 transition p-2" title="Supprimer">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -57,21 +58,21 @@
                 <!-- Reassurance highlights -->
                 <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-100 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                     <div class="flex items-center space-x-3">
-                        <span class="text-xl">🔒</span>
+                        <span class="text-xl">ðŸ”’</span>
                         <div>
-                            <div class="font-bold text-gray-900">Paiement 100% Sécurisé</div>
+                            <div class="font-bold text-gray-900">Paiement 100% SÃ©curisÃ©</div>
                             <div class="text-gray-500 text-[10px]">CB, Visa, Mastercard, Virement</div>
                         </div>
                     </div>
                     <div class="flex items-center space-x-3">
-                        <span class="text-xl">🔍</span>
+                        <span class="text-xl">ðŸ”</span>
                         <div>
-                            <div class="font-bold text-gray-900">Vérification Fichier Gratuite</div>
-                            <div class="text-gray-500 text-[10px]">Contrôle résolution & fonds perdus</div>
+                            <div class="font-bold text-gray-900">VÃ©rification Fichier Gratuite</div>
+                            <div class="text-gray-500 text-[10px]">ContrÃ´le rÃ©solution & fonds perdus</div>
                         </div>
                     </div>
                     <div class="flex items-center space-x-3">
-                        <span class="text-xl">🚚</span>
+                        <span class="text-xl">ðŸšš</span>
                         <div>
                             <div class="font-bold text-gray-900">Livraison Express Suivie</div>
                             <div class="text-gray-500 text-[10px]">Chrono 24h/48h avec suivi</div>
@@ -84,13 +85,13 @@
             <!-- Order Summary Sidebar -->
             <div class="lg:col-span-4" x-show="items.length > 0">
                 <div class="bg-white rounded-3xl p-6 border border-gray-200 shadow-xl space-y-6">
-                    <h2 class="text-lg font-bold text-gray-900 pb-4 border-b border-gray-100">Récapitulatif de Commande</h2>
+                    <h2 class="text-lg font-bold text-gray-900 pb-4 border-b border-gray-100">RÃ©capitulatif de Commande</h2>
 
                     <!-- Price breakdown -->
                     <div class="space-y-3 text-xs">
                         <div class="flex justify-between text-gray-600">
                             <span>Sous-total HT</span>
-                            <span class="font-bold text-gray-900" x-text="subtotalHT + ' €'"></span>
+                            <span class="font-bold text-gray-900" x-text="subtotalHT + ' â‚¬'"></span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Frais de livraison (Express 24h)</span>
@@ -98,7 +99,7 @@
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>TVA (20%)</span>
-                            <span class="font-bold text-gray-900" x-text="tva + ' €'"></span>
+                            <span class="font-bold text-gray-900" x-text="tva + ' â‚¬'"></span>
                         </div>
 
                         <!-- Promo Code input -->
@@ -112,7 +113,7 @@
                         <div class="pt-4 border-t border-gray-100 flex justify-between items-end">
                             <div>
                                 <span class="text-xs font-bold text-gray-900 uppercase">Total TTC</span>
-                                <div class="text-2xl font-extrabold text-brand-orange" x-text="totalTTC + ' €'"></div>
+                                <div class="text-2xl font-extrabold text-brand-orange" x-text="totalTTC + ' â‚¬'"></div>
                             </div>
                         </div>
                     </div>
@@ -137,16 +138,16 @@ function cartManager() {
                 id: 1,
                 title: 'Cartes de Visite Premium 350g',
                 category: 'Imprimerie',
-                options: '500 ex. — Pelliculage Soft-Touch + Coins Arrondis',
+                options: '500 ex. â€” Pelliculage Soft-Touch + Coins Arrondis',
                 price: 76.00,
                 qty: 1,
                 image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=300&q=80'
             },
             {
                 id: 2,
-                title: 'Néon LED Sur-Mesure "Cocktail & Dreams"',
-                category: 'Enseignes & Signalétique',
-                options: 'Largeur 90cm — Néon Rose Fluo + Acrylique Contour',
+                title: 'NÃ©on LED Sur-Mesure "Cocktail & Dreams"',
+                category: 'Enseignes & SignalÃ©tique',
+                options: 'Largeur 90cm â€” NÃ©on Rose Fluo + Acrylique Contour',
                 price: 185.00,
                 qty: 1,
                 image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=300&q=80'
@@ -171,7 +172,7 @@ function cartManager() {
         },
 
         proceedToCheckout() {
-            alert('Commande de ' + this.totalTTC + '€ TTC transmise au paiement sécurisé !');
+            alert('Commande de ' + this.totalTTC + 'â‚¬ TTC transmise au paiement sÃ©curisÃ© !');
         }
     }
 }

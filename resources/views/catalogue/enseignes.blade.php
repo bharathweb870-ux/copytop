@@ -3,6 +3,7 @@
 @section('title', 'Enseignes & Signalétique sur Mesure — Shri Bharathi')
 @section('description', 'Conception, fabrication et installation d\'enseignes lumineuses, caissons LED, neons sur-mesure, lettrage relief 3D, plaques professionnelles et habillage de vitrines.')
 
+@section('main-class', '')
 @section('content')
 <main class="bg-gray-900 text-white min-h-screen">
     <!-- Category Hero Header -->
@@ -13,7 +14,7 @@
             <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl"></div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-16 relative z-10">
             <!-- Breadcrumb -->
             <nav class="flex items-center space-x-2 text-xs text-gray-400 mb-6">
                 <a href="{{ route('home') }}" class="hover:text-white transition">Accueil</a>

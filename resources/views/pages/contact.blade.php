@@ -3,8 +3,9 @@
 @section('title', 'Contactez-nous — Shri Bharathi')
 @section('description', 'Prenez contact avec notre équipe commerciale et nos graphistes conseillers.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-50 min-h-screen py-12" x-data="{ sent: false }">
+<main class="bg-gray-50 min-h-screen pt-24 sm:pt-28 pb-12" x-data="{ sent: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="text-center max-w-2xl mx-auto mb-12">

@@ -3,10 +3,11 @@
 @section('title', 'Papeterie & Décoration Mariage & Événements — Shri Bharathi')
 @section('description', 'Faire-part de mariage haut de gamme, dorure à chaud, découpe laser, panneaux de bienvenue plexiglas miroir, menus de table, marque-places et livre d\'or personnalisé.')
 
+@section('main-class', '')
 @section('content')
 <main class="bg-amber-50/30 text-gray-900 min-h-screen">
     <!-- Category Hero Header -->
-    <div class="relative overflow-hidden bg-gradient-to-b from-stone-900 via-stone-900 to-amber-950 text-white py-16 sm:py-24">
+    <div class="relative overflow-hidden bg-gradient-to-b from-stone-900 via-stone-900 to-amber-950 text-white pt-24 sm:pt-28 pb-16">
         <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:32px_32px]"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <nav class="flex items-center space-x-2 text-xs text-amber-200/70 mb-6">

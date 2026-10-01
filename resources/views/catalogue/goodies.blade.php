@@ -3,10 +3,11 @@
 @section('title', 'Personnalisation & Objets Publicitaires Goodies — Shri Bharathi')
 @section('description', 'Textile personnalisé, tote bags en coton bio, mugs gravés, stylos publicitaires, gourdes inox et goodies d\'entreprise.')
 
+@section('main-class', '')
 @section('content')
 <main class="bg-gray-50 text-gray-900 min-h-screen">
     <!-- Hero Header -->
-    <div class="bg-gradient-to-b from-indigo-950 via-indigo-900 to-gray-900 text-white py-16">
+    <div class="bg-gradient-to-b from-indigo-950 via-indigo-900 to-gray-900 text-white pt-24 sm:pt-28 pb-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex items-center space-x-2 text-xs text-indigo-200/70 mb-6">
                 <a href="{{ route('home') }}" class="hover:text-white transition">Accueil</a>

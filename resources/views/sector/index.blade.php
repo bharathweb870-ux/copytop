@@ -3,8 +3,9 @@
 @section('title', 'Solutions d\'Impression & Enseignes par Secteur d\'Activité — Shri Bharathi')
 @section('description', 'Packs d\'enseignes et imprimés adaptés à votre métier : Restauration, Hôtellerie, Événementiel, BTP, Immobilier et Commerces.')
 
+@section('main-class', '')
 @section('content')
-<main class="bg-gray-50 min-h-screen py-12">
+<main class="bg-gray-50 min-h-screen pt-24 sm:pt-28 pb-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto mb-12">
             <span class="text-xs font-bold text-brand-orange uppercase tracking-widest">Solutions Métiers Sur-Mesure</span>
