@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Recherche â€” Shri Bharathi')
 @section('description', 'Recherchez parmi nos produits d\'impression, enseignes, mariage, packaging et goodies. Trouvez votre solution en quelques secondes.')
@@ -172,7 +172,7 @@
 
 @push('scripts')
 <script>
-const SB_SEARCH_INDEX = @json([
+const SB_SEARCH_INDEX = @js([
     ['name' => 'Cartes de Visite Premium', 'slug' => 'cartes-de-visite', 'category' => 'imprimerie', 'route' => '/produit-configurable/cartes-de-visite', 'tags' => 'carte visite impression dorure soft touch pellicule coins arrondis nfc pvc'],
     ['name' => 'Flyers A5 / A4', 'slug' => 'flyers', 'category' => 'imprimerie', 'route' => '/produit-configurable/flyers', 'tags' => 'flyer tract prospectus a5 a4 dl carre recto verso'],
     ['name' => 'DÃ©pliants 2 & 3 Volets', 'slug' => 'depliants', 'category' => 'imprimerie', 'route' => '/produit-configurable/depliants', 'tags' => 'depliant brochure 2 3 volets accordeon pliant'],

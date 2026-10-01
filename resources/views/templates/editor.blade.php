@@ -3,203 +3,593 @@
 @section('title', 'Studio d\'Édition Graphique en Ligne — Shri Bharathi')
 @section('description', 'Éditeur de création visuelle professionnel en ligne. Personnalisez vos imprimés en direct.')
 
-@section('main-class', 'pt-16 sm:pt-24')
+@section('main-class', 'pt-14 sm:pt-20 pb-0 overflow-hidden')
 
 @section('content')
-<main class="bg-gray-950 text-white min-h-[calc(100vh-4rem)] flex flex-col w-full overflow-x-hidden" x-data="graphicEditor()">
+<main class="bg-gray-950 text-white min-h-[100dvh] flex flex-col w-full max-w-full overflow-hidden select-none" 
+      x-data="graphicEditor()" 
+      x-init="init()"
+      @click="if ($event.target.closest('#design-canvas') === null && $event.target.closest('#mobile-bottom-sheet') === null && $event.target.closest('#mobile-bottom-bar') === null && $event.target.closest('#desktop-tool-panel') === null && $event.target.closest('#desktop-props-panel') === null) { deselectElement(); }">
 
-    {{-- ===== EDITOR TOP ACTION BAR ===== --}}
-    <header class="bg-gray-900 border-b border-gray-800 w-full z-20 sticky top-14 sm:top-20">
-
-        {{-- Main Control Bar --}}
-        <div class="flex items-center justify-between px-2 py-2 sm:px-4 gap-1.5 w-full max-w-full overflow-x-hidden">
+    {{-- ========================================== --}}
+    {{-- 1. EDITOR TOP ACTION BAR (MOBILE + DESKTOP) --}}
+    {{-- ========================================== --}}
+    <header class="bg-gray-900 border-b border-gray-800 w-full z-30 sticky top-0 sm:top-20 shadow-md flex-shrink-0">
+        <div class="flex items-center justify-between px-2.5 py-2 sm:px-4 gap-2 w-full max-w-full overflow-hidden">
 
             {{-- Left: Back link + Template Title --}}
-            <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                <a href="{{ route('templates') }}" class="text-gray-400 hover:text-white flex items-center gap-1 text-[11px] sm:text-xs flex-shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    <span class="hidden sm:inline">Retour</span>
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+                <a href="{{ route('templates') }}" class="text-gray-400 hover:text-white flex items-center gap-1 text-xs font-semibold flex-shrink-0 transition" title="Retour aux modèles">
+                    <svg class="w-4 h-4 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span class="hidden sm:inline">Modèles</span>
                 </a>
-                <span class="h-3.5 w-px bg-gray-700 flex-shrink-0"></span>
-                <div class="text-[11px] sm:text-xs font-bold text-white truncate min-w-0">
-                    <span class="text-gray-400 hidden md:inline">Modèle : </span>
-                    <span class="text-brand-orange truncate" x-text="templateName"></span>
+                <span class="h-4 w-px bg-gray-800 flex-shrink-0"></span>
+                <div class="text-xs font-bold text-white truncate min-w-0 flex items-center gap-1">
+                    <span class="text-gray-400 hidden lg:inline flex-shrink-0">Modèle : </span>
+                    <span class="text-brand-orange truncate block max-w-[130px] sm:max-w-[220px] lg:max-w-[300px]" x-text="templateName"></span>
                 </div>
             </div>
 
-            {{-- Center/Right: Controls + Validate --}}
+            {{-- Right Controls --}}
             <div class="flex items-center gap-1.5 flex-shrink-0">
 
-                {{-- Zoom Controls --}}
-                <div class="flex items-center bg-gray-800 px-1.5 py-1 rounded border border-gray-700 text-[10px] sm:text-xs">
-                    <button @click="zoom = Math.max(zoom - 10, 50)" class="hover:text-brand-orange font-bold px-1 text-xs" title="Dézoomer">−</button>
-                    <span class="w-7 sm:w-9 text-center text-amber-400 font-bold" x-text="zoom + '%'"></span>
-                    <button @click="zoom = Math.min(zoom + 10, 200)" class="hover:text-brand-orange font-bold px-1 text-xs" title="Zoomer">+</button>
+                {{-- Undo Button --}}
+                <button @click="undo()" :disabled="historyIndex <= 0" 
+                        :class="{'opacity-30 cursor-not-allowed': historyIndex <= 0, 'hover:bg-gray-800 hover:text-white': historyIndex > 0}"
+                        class="p-1.5 sm:p-2 rounded text-gray-300 bg-gray-800/80 border border-gray-700/80 transition" title="Annuler (Undo)">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                </button>
+
+                {{-- Redo Button --}}
+                <button @click="redo()" :disabled="historyIndex >= history.length - 1" 
+                        :class="{'opacity-30 cursor-not-allowed': historyIndex >= history.length - 1, 'hover:bg-gray-800 hover:text-white': historyIndex < history.length - 1}"
+                        class="p-1.5 sm:p-2 rounded text-gray-300 bg-gray-800/80 border border-gray-700/80 transition" title="Rétablir (Redo)">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6"/></svg>
+                </button>
+
+                {{-- Preview Toggle --}}
+                <button @click="previewMode = !previewMode" 
+                        :class="{'bg-amber-500/20 text-amber-400 border-amber-500/50': previewMode, 'bg-gray-800 text-gray-300 border-gray-700': !previewMode}"
+                        class="px-2 py-1.5 rounded border text-xs font-semibold flex items-center gap-1 transition" title="Aperçu du rendu">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <span class="hidden md:inline">Aperçu</span>
+                </button>
+
+                {{-- Desktop Secondary Controls (Hidden on Mobile) --}}
+                <div class="hidden lg:flex items-center gap-1.5">
+                    {{-- Zoom Controls --}}
+                    <div class="flex items-center bg-gray-800 px-1.5 py-1 rounded border border-gray-700 text-xs">
+                        <button @click="zoom = Math.max(zoom - 10, 50)" class="hover:text-brand-orange font-bold px-1.5 text-xs" title="Dézoomer">−</button>
+                        <span class="w-9 text-center text-amber-400 font-bold" x-text="zoom + '%'"></span>
+                        <button @click="zoom = Math.min(zoom + 10, 200)" class="hover:text-brand-orange font-bold px-1.5 text-xs" title="Zoomer">+</button>
+                    </div>
+
+                    {{-- Bleed Toggle --}}
+                    <button @click="showBleedLines = !showBleedLines"
+                        :class="{'bg-brand-orange text-white': showBleedLines, 'bg-gray-800 text-gray-300': !showBleedLines}"
+                        class="flex items-center gap-1 px-2 py-1 rounded border border-gray-700 text-xs font-medium transition whitespace-nowrap">
+                        📐 <span x-text="showBleedLines ? 'Repères ON' : 'Repères OFF'"></span>
+                    </button>
+
+                    {{-- CMJN Badge --}}
+                    <span class="inline-flex items-center bg-green-500/20 text-green-400 text-[10px] px-2 py-0.5 rounded border border-green-500/30 font-mono whitespace-nowrap">CMJN 300DPI</span>
+
+                    {{-- PDF BAT --}}
+                    <button @click="downloadProof()" class="flex items-center gap-1 px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold rounded border border-gray-700 transition">
+                        📥 PDF
+                    </button>
                 </div>
 
-                {{-- Bleed Toggle --}}
-                <button @click="showBleedLines = !showBleedLines"
-                    :class="{'bg-brand-orange text-white': showBleedLines, 'bg-gray-800 text-gray-300': !showBleedLines}"
-                    class="hidden sm:flex items-center gap-1 px-2 py-1 rounded border border-gray-700 text-[10px] font-medium transition whitespace-nowrap">
-                    📐 <span x-text="showBleedLines ? 'Repères ON' : 'Repères OFF'"></span>
-                </button>
-
-                {{-- CMJN Badge (Desktop) --}}
-                <span class="hidden lg:inline-flex items-center bg-green-500/20 text-green-400 text-[9px] px-1.5 py-0.5 rounded border border-green-500/30 whitespace-nowrap">CMJN 300DPI</span>
-
-                {{-- PDF BAT --}}
-                <button @click="downloadProof()" class="hidden md:flex items-center gap-1 px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold rounded border border-gray-700 transition">
-                    📥 PDF
-                </button>
-
-                {{-- Validate Button --}}
-                <button @click="saveAndValidate()" class="flex items-center gap-1 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r from-brand-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-[11px] sm:text-xs font-bold rounded shadow transition whitespace-nowrap">
+                {{-- Validate Button (Always visible) --}}
+                <button @click="saveAndValidate()" class="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-brand-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-xs font-bold rounded shadow transition whitespace-nowrap">
                     <span>Valider</span>
-                    <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </button>
             </div>
         </div>
     </header>
 
-    {{-- ===== MAIN WORKSPACE CONTAINER ===== --}}
-    <div class="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-x-hidden min-h-0">
+    {{-- ========================================== --}}
+    {{-- 2. MAIN WORKSPACE CONTAINER                --}}
+    {{-- ========================================== --}}
+    <div class="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 relative">
 
-        {{-- Left Toolbar Tabs (Horizontal on mobile, vertical on desktop) --}}
-        <aside class="w-full lg:w-16 bg-gray-900 border-b lg:border-b-0 lg:border-r border-gray-800 flex flex-row lg:flex-col items-center justify-around lg:justify-start py-1 lg:py-4 px-1 lg:px-0 lg:space-y-4 flex-shrink-0 z-10">
-            <button @click="activeTab = 'text'"
+        {{-- DESKTOP LEFT TOOLBAR (Hidden on Mobile) --}}
+        <aside class="hidden lg:flex w-16 bg-gray-900 border-r border-gray-800 flex-col items-center py-4 space-y-4 flex-shrink-0 z-10">
+            <button @click="openTab('text')"
                     :class="{'text-brand-orange bg-gray-800': activeTab === 'text'}"
-                    class="flex-1 lg:flex-initial py-1.5 lg:py-0 lg:w-12 lg:h-12 rounded-lg flex flex-col items-center justify-center hover:bg-gray-800 hover:text-white transition text-gray-400">
-                <svg class="w-4 h-4 lg:w-5 lg:h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"/></svg>
+                    class="w-12 h-12 rounded-lg flex flex-col items-center justify-center hover:bg-gray-800 hover:text-white transition text-gray-400">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"/></svg>
                 <span class="text-[9px] font-medium">Texte</span>
             </button>
-            <button @click="activeTab = 'images'"
+            <button @click="openTab('images')"
                     :class="{'text-brand-orange bg-gray-800': activeTab === 'images'}"
-                    class="flex-1 lg:flex-initial py-1.5 lg:py-0 lg:w-12 lg:h-12 rounded-lg flex flex-col items-center justify-center hover:bg-gray-800 hover:text-white transition text-gray-400">
-                <svg class="w-4 h-4 lg:w-5 lg:h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    class="w-12 h-12 rounded-lg flex flex-col items-center justify-center hover:bg-gray-800 hover:text-white transition text-gray-400">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span class="text-[9px] font-medium">Images</span>
             </button>
-            <button @click="activeTab = 'shapes'"
+            <button @click="openTab('shapes')"
                     :class="{'text-brand-orange bg-gray-800': activeTab === 'shapes'}"
-                    class="flex-1 lg:flex-initial py-1.5 lg:py-0 lg:w-12 lg:h-12 rounded-lg flex flex-col items-center justify-center hover:bg-gray-800 hover:text-white transition text-gray-400">
-                <svg class="w-4 h-4 lg:w-5 lg:h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a2 2 0 01-2 2h-1a2 2 0 01-2-2V4zM4 11a2 2 0 012-2h1a2 2 0 012 2v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1zM11 16a2 2 0 012-2h1a2 2 0 012 2v1a2 2 0 01-2 2h-1a2 2 0 01-2-2v-1z"/></svg>
+                    class="w-12 h-12 rounded-lg flex flex-col items-center justify-center hover:bg-gray-800 hover:text-white transition text-gray-400">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a2 2 0 01-2 2h-1a2 2 0 01-2-2V4zM4 11a2 2 0 012-2h1a2 2 0 012 2v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1zM11 16a2 2 0 012-2h1a2 2 0 012 2v1a2 2 0 01-2 2h-1a2 2 0 01-2-2v-1z"/></svg>
                 <span class="text-[9px] font-medium">Formes</span>
             </button>
-            <button @click="activeTab = 'bg'"
+            <button @click="openTab('bg')"
                     :class="{'text-brand-orange bg-gray-800': activeTab === 'bg'}"
-                    class="flex-1 lg:flex-initial py-1.5 lg:py-0 lg:w-12 lg:h-12 rounded-lg flex flex-col items-center justify-center hover:bg-gray-800 hover:text-white transition text-gray-400">
-                <svg class="w-4 h-4 lg:w-5 lg:h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                    class="w-12 h-12 rounded-lg flex flex-col items-center justify-center hover:bg-gray-800 hover:text-white transition text-gray-400">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
                 <span class="text-[9px] font-medium">Fond</span>
             </button>
         </aside>
 
-        {{-- Tool Sub-panel + Canvas + Properties --}}
-        <div class="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-x-hidden min-h-0">
-
-            {{-- Active Tool Options Panel --}}
-            <div class="w-full lg:w-56 bg-gray-900/90 border-b lg:border-b-0 lg:border-r border-gray-800 p-2.5 text-xs select-none flex-shrink-0">
-
-                {{-- TEXT TOOL --}}
-                <div x-show="activeTab === 'text'" class="space-y-2">
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ajouter du texte</div>
-                    <div class="grid grid-cols-3 lg:grid-cols-1 gap-1.5">
-                        <button @click="addText('Titre Principal')" class="py-1.5 px-2 bg-brand-orange hover:bg-orange-600 text-white font-bold rounded transition text-center text-[11px] truncate">+ Titre</button>
-                        <button @click="addText('Sous-titre explicatif')" class="py-1.5 px-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded transition text-center border border-gray-700 text-[11px] truncate">+ Sous-Titre</button>
-                        <button @click="addText('Texte de corps')" class="py-1.5 px-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded transition text-center border border-gray-700 text-[11px] truncate">+ Corps</button>
-                    </div>
-                </div>
-
-                {{-- IMAGES TOOL --}}
-                <div x-show="activeTab === 'images'" class="space-y-2">
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Importer une image</div>
-                    <button class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded border border-dashed border-gray-600 text-[11px] font-medium transition text-center">
-                        📁 Choisir un fichier (PNG/SVG)
-                    </button>
-                </div>
-
-                {{-- SHAPES TOOL --}}
-                <div x-show="activeTab === 'shapes'" class="space-y-2">
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ajouter une forme</div>
-                    <div class="grid grid-cols-3 gap-1.5">
-                        <button @click="addText('■ Rect')" class="py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-gray-700 text-[10px] text-center">Rect</button>
-                        <button @click="addText('● Cercle')" class="py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-gray-700 text-[10px] text-center">Cercle</button>
-                        <button @click="addText('── Line')" class="py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-gray-700 text-[10px] text-center">Ligne</button>
-                    </div>
-                </div>
-
-                {{-- BACKGROUND TOOL --}}
-                <div x-show="activeTab === 'bg'" class="space-y-2">
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Couleur du support</div>
-                    <div class="grid grid-cols-4 gap-1.5">
-                        <button @click="canvasBg = '#ffffff'" class="h-6 rounded bg-white border border-gray-400 focus:ring-2 focus:ring-amber-400" title="Blanc"></button>
-                        <button @click="canvasBg = '#18181b'" class="h-6 rounded bg-stone-900 border border-gray-700 focus:ring-2 focus:ring-amber-400" title="Noir Sombre"></button>
-                        <button @click="canvasBg = '#fef3c7'" class="h-6 rounded bg-amber-100 border border-amber-300 focus:ring-2 focus:ring-amber-400" title="Ivoire"></button>
-                        <button @click="canvasBg = '#ecfdf5'" class="h-6 rounded bg-emerald-50 border border-emerald-300 focus:ring-2 focus:ring-amber-400" title="Menthe"></button>
-                    </div>
+        {{-- DESKTOP ACTIVE TOOL PANEL (Hidden on Mobile) --}}
+        <div id="desktop-tool-panel" class="hidden lg:block w-56 bg-gray-900/90 border-r border-gray-800 p-3 text-xs select-none flex-shrink-0 overflow-y-auto">
+            {{-- TEXT TOOL --}}
+            <div x-show="activeTab === 'text'" class="space-y-3">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ajouter du texte</div>
+                <div class="space-y-2">
+                    <button @click="addText('Titre Principal')" class="w-full py-2 px-3 bg-brand-orange hover:bg-orange-600 text-white font-bold rounded transition text-left text-xs">+ Titre Principal</button>
+                    <button @click="addText('Sous-titre explicatif')" class="w-full py-2 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded transition text-left border border-gray-700 text-xs">+ Sous-Titre</button>
+                    <button @click="addText('Texte de corps')" class="w-full py-2 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded transition text-left border border-gray-700 text-xs">+ Corps de texte</button>
                 </div>
             </div>
 
-            {{-- CANVAS PREVIEW AREA --}}
-            <section class="flex-1 bg-gray-950 flex flex-col items-center justify-center p-2 sm:p-4 relative min-h-[220px] lg:min-h-0 overflow-auto w-full max-w-full">
-                <div class="relative bg-white shadow-2xl transition-all duration-300 border border-gray-700 rounded overflow-hidden select-none max-w-full"
-                     :style="'width: min(290px, 86vw); aspect-ratio: 1.5; background-color: ' + canvasBg + '; transform: scale(' + (zoom/100) + '); transform-origin: center center;'">
+            {{-- IMAGES TOOL --}}
+            <div x-show="activeTab === 'images'" class="space-y-3">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Importer une image</div>
+                <label class="w-full py-3 px-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded border border-dashed border-gray-600 text-xs font-medium transition text-center cursor-pointer block">
+                    📁 Choisir un fichier (PNG/SVG)
+                    <input type="file" accept="image/*" class="hidden" @change="handleFileUpload($event)">
+                </label>
+            </div>
 
-                    {{-- Bleed Guidelines --}}
-                    <div x-show="showBleedLines" class="absolute inset-1.5 border border-dashed border-red-500/60 pointer-events-none z-30 flex items-start justify-between p-0.5 text-[6px] text-red-500 font-mono">
-                        <span>3mm</span>
-                        <span>Zone sûre</span>
+            {{-- SHAPES TOOL --}}
+            <div x-show="activeTab === 'shapes'" class="space-y-3">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ajouter une forme</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button @click="addShape('rect')" class="py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-gray-700 text-xs font-medium text-center">⬛ Rect</button>
+                    <button @click="addShape('circle')" class="py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-gray-700 text-xs font-medium text-center">🔴 Cercle</button>
+                    <button @click="addShape('line')" class="py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-gray-700 text-xs font-medium text-center">➖ Ligne</button>
+                    <button @click="addShape('star')" class="py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-gray-700 text-xs font-medium text-center">⭐ Étoile</button>
+                </div>
+            </div>
+
+            {{-- BACKGROUND TOOL --}}
+            <div x-show="activeTab === 'bg'" class="space-y-3">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Couleur du support</div>
+                <div class="grid grid-cols-4 gap-2">
+                    <button @click="canvasBg = '#ffffff'; saveHistory();" class="h-8 rounded bg-white border border-gray-400 focus:ring-2 focus:ring-amber-400" title="Blanc"></button>
+                    <button @click="canvasBg = '#18181b'; saveHistory();" class="h-8 rounded bg-stone-900 border border-gray-700 focus:ring-2 focus:ring-amber-400" title="Noir"></button>
+                    <button @click="canvasBg = '#fef3c7'; saveHistory();" class="h-8 rounded bg-amber-100 border border-amber-300 focus:ring-2 focus:ring-amber-400" title="Ivoire"></button>
+                    <button @click="canvasBg = '#ecfdf5'; saveHistory();" class="h-8 rounded bg-emerald-50 border border-emerald-300 focus:ring-2 focus:ring-amber-400" title="Menthe"></button>
+                </div>
+                <div class="pt-2">
+                    <label class="block text-gray-400 text-[10px] mb-1">Couleur personnalisée</label>
+                    <input type="color" x-model="canvasBg" @change="saveHistory()" class="w-full h-8 bg-gray-950 border border-gray-700 rounded p-0.5 cursor-pointer">
+                </div>
+            </div>
+        </div>
+
+        {{-- ========================================== --}}
+        {{-- 3. CANVAS PREVIEW AREA (CENTER STAGE)       --}}
+        {{-- ========================================== --}}
+        <section id="design-canvas-area" class="flex-1 bg-gray-950 flex flex-col items-center justify-center p-3 sm:p-6 relative min-h-[320px] lg:min-h-0 overflow-auto w-full max-w-full pb-20 lg:pb-6">
+            
+            {{-- THE DESIGN CANVAS --}}
+            <div id="design-canvas" 
+                 class="relative shadow-2xl transition-all duration-200 border border-gray-700/80 rounded-md overflow-hidden select-none touch-none max-w-full"
+                 :style="'width: min(calc(100vw - 2rem), 440px); aspect-ratio: 1.5; background-color: ' + canvasBg + '; transform: scale(' + (zoom/100) + '); transform-origin: center center;'">
+
+                {{-- Bleed Guidelines --}}
+                <div x-show="showBleedLines && !previewMode" class="absolute inset-2 border border-dashed border-red-500/60 pointer-events-none z-30 flex items-start justify-between p-1 text-[7px] text-red-500 font-mono">
+                    <span>3mm Coupé</span>
+                    <span>Zone de Sécurité</span>
+                </div>
+
+                {{-- Canvas Elements --}}
+                <template x-for="(el, index) in elements" :key="el.id || index">
+                    <div @click.stop="selectElement(index)"
+                         @touchstart.stop="startDrag($event, index)"
+                         @mousedown.stop="startDrag($event, index)"
+                         class="absolute cursor-move p-1 transition-shadow select-none touch-none rounded"
+                         :class="{'ring-2 ring-brand-orange bg-brand-orange/10 z-20': selectedElementIndex === index && !previewMode, 'hover:ring-1 hover:ring-gray-400/50': selectedElementIndex !== index && !previewMode}"
+                         :style="'left:' + el.x + 'px; top:' + el.y + 'px; font-size:' + Math.max(9, Math.round(el.size * 0.7)) + 'px; color:' + el.color + '; font-family:' + el.font + '; text-align:' + (el.align || 'left')">
+                        
+                        {{-- Text Element --}}
+                        <template x-if="el.type === 'text'">
+                            <span x-text="el.content" class="whitespace-nowrap"></span>
+                        </template>
+
+                        {{-- Image Element --}}
+                        <template x-if="el.type === 'image'">
+                            <img :src="el.src" class="object-contain pointer-events-none" :style="'width:' + el.width + 'px; height:' + el.height + 'px;'">
+                        </template>
+
+                        {{-- Shape Element --}}
+                        <template x-if="el.type === 'shape'">
+                            <div :style="'width:' + el.width + 'px; height:' + el.height + 'px; background-color:' + el.color + ';' + (el.shape === 'circle' ? 'border-radius:9999px;' : (el.shape === 'line' ? 'height:3px;' : ''))"></div>
+                        </template>
                     </div>
+                </template>
+            </div>
 
-                    {{-- Editable Elements --}}
-                    <template x-for="(el, index) in elements" :key="index">
-                        <div @click="selectedElementIndex = index"
-                             class="absolute cursor-move p-1 transition select-none"
-                             :class="{'ring-1 ring-brand-orange bg-amber-400/10': selectedElementIndex === index}"
-                             :style="'left:' + el.x + 'px; top:' + el.y + 'px; font-size:' + Math.max(9, Math.round(el.size * 0.65)) + 'px; color:' + el.color + '; font-family:' + el.font">
-                            <span x-text="el.content"></span>
+            {{-- Helper hint on canvas --}}
+            <div x-show="selectedElementIndex === null && !previewMode" class="mt-3 text-[10px] text-gray-500 flex items-center gap-1 animate-pulse">
+                <span>👆 Touchez un élément pour le modifier ou choisissez un outil en bas</span>
+            </div>
+        </section>
+
+        {{-- DESKTOP ELEMENT PROPERTIES PANEL (Hidden on Mobile) --}}
+        <aside id="desktop-props-panel" class="hidden lg:block w-60 bg-gray-900 border-l border-gray-800 p-3 text-xs flex-shrink-0 overflow-y-auto">
+            <div class="font-bold text-white uppercase tracking-wider text-[10px] pb-2 mb-3 border-b border-gray-800 flex items-center justify-between">
+                <span>Propriétés de l'élément</span>
+                <span x-show="selectedElementIndex !== null" class="text-brand-orange font-mono text-[9px]">#<span x-text="selectedElementIndex + 1"></span></span>
+            </div>
+
+            <template x-if="selectedElementIndex !== null">
+                <div class="space-y-3">
+                    {{-- Text Content --}}
+                    <template x-if="elements[selectedElementIndex].type === 'text'">
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-gray-400 text-[10px] mb-1">Contenu du texte</label>
+                                <input type="text" x-model="elements[selectedElementIndex].content" @input="saveHistory()"
+                                    class="w-full bg-gray-950 border border-gray-700 rounded px-2.5 py-1.5 text-white font-semibold focus:border-brand-orange outline-none text-xs">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-400 text-[10px] mb-1">Police d'écriture</label>
+                                <select x-model="elements[selectedElementIndex].font" @change="saveHistory()"
+                                        class="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-white text-xs outline-none focus:border-brand-orange">
+                                    <template x-for="f in availableFonts" :key="f.name">
+                                        <option :value="f.family" x-text="f.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-gray-400 text-[10px] mb-1">Taille (px)</label>
+                                    <input type="number" x-model.number="elements[selectedElementIndex].size" @input="saveHistory()"
+                                        class="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-white font-semibold focus:border-brand-orange outline-none text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-400 text-[10px] mb-1">Couleur</label>
+                                    <input type="color" x-model="elements[selectedElementIndex].color" @change="saveHistory()"
+                                        class="w-full h-8 bg-gray-950 border border-gray-700 rounded p-0.5 cursor-pointer">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-400 text-[10px] mb-1">Alignement</label>
+                                <div class="grid grid-cols-3 gap-1 bg-gray-950 p-1 rounded border border-gray-800">
+                                    <button @click="elements[selectedElementIndex].align = 'left'; saveHistory();"
+                                            :class="{'bg-brand-orange text-white': elements[selectedElementIndex].align === 'left', 'text-gray-400': elements[selectedElementIndex].align !== 'left'}"
+                                            class="py-1 rounded text-center text-xs font-bold">📄 Gauche</button>
+                                    <button @click="elements[selectedElementIndex].align = 'center'; saveHistory();"
+                                            :class="{'bg-brand-orange text-white': elements[selectedElementIndex].align === 'center', 'text-gray-400': elements[selectedElementIndex].align !== 'center'}"
+                                            class="py-1 rounded text-center text-xs font-bold">📑 Centre</button>
+                                    <button @click="elements[selectedElementIndex].align = 'right'; saveHistory();"
+                                            :class="{'bg-brand-orange text-white': elements[selectedElementIndex].align === 'right', 'text-gray-400': elements[selectedElementIndex].align !== 'right'}"
+                                            class="py-1 rounded text-center text-xs font-bold">📝 Droite</button>
+                                </div>
+                            </div>
                         </div>
                     </template>
-                </div>
-            </section>
 
-            {{-- ELEMENT PROPERTIES PANEL --}}
-            <aside class="w-full lg:w-60 bg-gray-900 border-t lg:border-t-0 lg:border-l border-gray-800 p-2.5 text-xs flex-shrink-0">
-                <div class="font-bold text-white uppercase tracking-wider text-[10px] pb-1.5 mb-2 border-b border-gray-800">
-                    Propriétés
-                </div>
+                    {{-- Image Content --}}
+                    <template x-if="elements[selectedElementIndex].type === 'image'">
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-gray-400 text-[10px] mb-1">Dimensions (px)</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="number" x-model.number="elements[selectedElementIndex].width" @input="saveHistory()" class="bg-gray-950 border border-gray-700 rounded px-2 py-1 text-white text-xs">
+                                    <input type="number" x-model.number="elements[selectedElementIndex].height" @input="saveHistory()" class="bg-gray-950 border border-gray-700 rounded px-2 py-1 text-white text-xs">
+                                </div>
+                            </div>
+                        </div>
+                    </template>
 
+                    {{-- Shape Content --}}
+                    <template x-if="elements[selectedElementIndex].type === 'shape'">
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-gray-400 text-[10px] mb-1">Couleur de la forme</label>
+                                <input type="color" x-model="elements[selectedElementIndex].color" @change="saveHistory()" class="w-full h-8 bg-gray-950 border border-gray-700 rounded p-0.5 cursor-pointer">
+                            </div>
+                        </div>
+                    </template>
+
+                    {{-- Delete Element Button --}}
+                    <button @click="deleteSelectedElement()"
+                        class="w-full py-2 bg-red-600/20 text-red-400 border border-red-500/30 font-semibold rounded hover:bg-red-600 hover:text-white transition text-xs flex items-center justify-center gap-1.5 mt-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        <span>Supprimer l'élément</span>
+                    </button>
+                </div>
+            </template>
+
+            <template x-if="selectedElementIndex === null">
+                <p class="text-center py-6 text-gray-500 italic text-xs">Cliquez sur un élément de votre création pour afficher ses propriétés.</p>
+            </template>
+        </aside>
+    </div>
+
+    {{-- ========================================== --}}
+    {{-- 4. MOBILE BOTTOM FIXED NAVBAR (< lg)       --}}
+    {{-- ========================================== --}}
+    <nav id="mobile-bottom-bar" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-gray-900 border-t border-gray-800 shadow-2xl pb-safe">
+        <div class="grid grid-cols-5 h-14 items-center">
+            
+            {{-- Texte --}}
+            <button @click="openTab('text')"
+                    :class="{'text-brand-orange bg-gray-800/60 font-bold': activeTab === 'text' && showBottomSheet, 'text-gray-400': activeTab !== 'text' || !showBottomSheet}"
+                    class="flex flex-col items-center justify-center h-full hover:text-white transition min-h-[44px]">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"/></svg>
+                <span class="text-[10px]">Texte</span>
+            </button>
+
+            {{-- Images --}}
+            <button @click="openTab('images')"
+                    :class="{'text-brand-orange bg-gray-800/60 font-bold': activeTab === 'images' && showBottomSheet, 'text-gray-400': activeTab !== 'images' || !showBottomSheet}"
+                    class="flex flex-col items-center justify-center h-full hover:text-white transition min-h-[44px]">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span class="text-[10px]">Images</span>
+            </button>
+
+            {{-- Formes --}}
+            <button @click="openTab('shapes')"
+                    :class="{'text-brand-orange bg-gray-800/60 font-bold': activeTab === 'shapes' && showBottomSheet, 'text-gray-400': activeTab !== 'shapes' || !showBottomSheet}"
+                    class="flex flex-col items-center justify-center h-full hover:text-white transition min-h-[44px]">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a2 2 0 01-2 2h-1a2 2 0 01-2-2V4zM4 11a2 2 0 012-2h1a2 2 0 012 2v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1zM11 16a2 2 0 012-2h1a2 2 0 012 2v1a2 2 0 01-2 2h-1a2 2 0 01-2-2v-1z"/></svg>
+                <span class="text-[10px]">Formes</span>
+            </button>
+
+            {{-- Fond --}}
+            <button @click="openTab('bg')"
+                    :class="{'text-brand-orange bg-gray-800/60 font-bold': activeTab === 'bg' && showBottomSheet, 'text-gray-400': activeTab !== 'bg' || !showBottomSheet}"
+                    class="flex flex-col items-center justify-center h-full hover:text-white transition min-h-[44px]">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                <span class="text-[10px]">Fond</span>
+            </button>
+
+            {{-- Plus (More) --}}
+            <button @click="openTab('more')"
+                    :class="{'text-brand-orange bg-gray-800/60 font-bold': activeTab === 'more' && showBottomSheet, 'text-gray-400': activeTab !== 'more' || !showBottomSheet}"
+                    class="flex flex-col items-center justify-center h-full hover:text-white transition min-h-[44px]">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                <span class="text-[10px]">Plus</span>
+            </button>
+        </div>
+    </nav>
+
+    {{-- ========================================== --}}
+    {{-- 5. MOBILE BOTTOM SHEET / DRAWER (< lg)     --}}
+    {{-- ========================================== --}}
+    <div id="mobile-bottom-sheet" 
+         x-show="showBottomSheet"
+         x-transition:enter="transition ease-out duration-300 transform"
+         x-transition:enter-start="translate-y-full opacity-0"
+         x-transition:enter-end="translate-y-0 opacity-100"
+         x-transition:leave="transition ease-in duration-200 transform"
+         x-transition:leave-start="translate-y-0 opacity-100"
+         x-transition:leave-end="translate-y-full opacity-0"
+         class="lg:hidden fixed inset-x-0 bottom-14 z-50 bg-gray-900 border-t border-gray-700/80 rounded-t-2xl shadow-2xl max-h-[60vh] flex flex-col overflow-hidden">
+        
+        {{-- Drawer Drag Handle & Header --}}
+        <div class="px-4 pt-2.5 pb-2 bg-gray-900 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+            <div class="w-10 h-1 bg-gray-700 rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2"></div>
+            
+            <div class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5 mt-1">
                 <template x-if="selectedElementIndex !== null">
-                    <div class="space-y-2">
-                        <div>
-                            <label class="block text-gray-400 text-[9px] mb-0.5">Texte</label>
-                            <input type="text" x-model="elements[selectedElementIndex].content"
-                                class="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1 text-white font-semibold focus:border-brand-orange outline-none text-xs">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
+                    <span class="text-brand-orange">✏️ Modifier l'élément</span>
+                </template>
+                <template x-if="selectedElementIndex === null">
+                    <span x-text="activeTab === 'text' ? '🔤 Outil Texte' : (activeTab === 'images' ? '🖼️ Outil Image' : (activeTab === 'shapes' ? '🔷 Outil Formes' : (activeTab === 'bg' ? '🎨 Couleur de Fond' : '⚙️ Réglages Studio')))"></span>
+                </template>
+            </div>
+
+            <button @click="closeBottomSheet()" class="p-1 rounded-full bg-gray-800 text-gray-400 hover:text-white transition" title="Fermer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        {{-- Drawer Content (Scrollable) --}}
+        <div class="p-4 overflow-y-auto space-y-4 text-xs">
+            
+            {{-- A. SELECTED ELEMENT EDITING PROPERTIES --}}
+            <template x-if="selectedElementIndex !== null">
+                <div class="space-y-3">
+                    
+                    {{-- Text Element Editing --}}
+                    <template x-if="elements[selectedElementIndex].type === 'text'">
+                        <div class="space-y-3">
                             <div>
-                                <label class="block text-gray-400 text-[9px] mb-0.5">Taille (px)</label>
-                                <input type="number" x-model="elements[selectedElementIndex].size"
-                                    class="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1 text-white font-semibold focus:border-brand-orange outline-none text-xs">
+                                <label class="block text-gray-400 text-[10px] mb-1 font-semibold">Texte</label>
+                                <input type="text" x-model="elements[selectedElementIndex].content" @input="saveHistory()"
+                                    class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-white font-semibold focus:border-brand-orange outline-none text-sm min-h-[44px]">
                             </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-gray-400 text-[10px] mb-1 font-semibold">Police</label>
+                                    <select x-model="elements[selectedElementIndex].font" @change="saveHistory()"
+                                            class="w-full bg-gray-950 border border-gray-700 rounded-lg px-2 py-2 text-white text-xs outline-none focus:border-brand-orange min-h-[44px]">
+                                        <template x-for="f in availableFonts" :key="f.name">
+                                            <option :value="f.family" x-text="f.name"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-400 text-[10px] mb-1 font-semibold">Taille (px)</label>
+                                    <div class="flex items-center bg-gray-950 rounded-lg border border-gray-700 min-h-[44px] overflow-hidden">
+                                        <button @click="elements[selectedElementIndex].size = Math.max(8, elements[selectedElementIndex].size - 1); saveHistory();" class="px-3 text-amber-400 font-bold text-base min-h-[44px] flex items-center justify-center bg-gray-800/50">−</button>
+                                        <input type="number" x-model.number="elements[selectedElementIndex].size" @input="saveHistory()" class="w-full bg-transparent text-center text-white font-bold text-xs outline-none">
+                                        <button @click="elements[selectedElementIndex].size = Math.min(60, elements[selectedElementIndex].size + 1); saveHistory();" class="px-3 text-amber-400 font-bold text-base min-h-[44px] flex items-center justify-center bg-gray-800/50">+</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Color Swatches & Picker --}}
                             <div>
-                                <label class="block text-gray-400 text-[9px] mb-0.5">Couleur</label>
-                                <input type="color" x-model="elements[selectedElementIndex].color"
-                                    class="w-full h-7 bg-gray-950 border border-gray-700 rounded p-0.5 cursor-pointer">
+                                <label class="block text-gray-400 text-[10px] mb-1.5 font-semibold">Couleur du texte</label>
+                                <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                                    <template x-for="color in colorSwatches" :key="color">
+                                        <button @click="elements[selectedElementIndex].color = color; saveHistory();"
+                                                :style="'background-color: ' + color"
+                                                :class="{'ring-2 ring-brand-orange scale-110': elements[selectedElementIndex].color === color}"
+                                                class="w-8 h-8 rounded-full border border-gray-600 flex-shrink-0 transition transform min-h-[32px]"></button>
+                                    </template>
+                                    <input type="color" x-model="elements[selectedElementIndex].color" @change="saveHistory()" class="w-8 h-8 bg-gray-950 border border-gray-700 rounded-full p-0.5 cursor-pointer flex-shrink-0">
+                                </div>
+                            </div>
+
+                            {{-- Text Alignment --}}
+                            <div>
+                                <label class="block text-gray-400 text-[10px] mb-1 font-semibold">Alignement</label>
+                                <div class="grid grid-cols-3 gap-1.5 bg-gray-950 p-1 rounded-lg border border-gray-800">
+                                    <button @click="elements[selectedElementIndex].align = 'left'; saveHistory();"
+                                            :class="{'bg-brand-orange text-white font-bold': elements[selectedElementIndex].align === 'left', 'text-gray-400': elements[selectedElementIndex].align !== 'left'}"
+                                            class="py-2 rounded text-center text-xs transition min-h-[36px] flex items-center justify-center">📄 Gauche</button>
+                                    <button @click="elements[selectedElementIndex].align = 'center'; saveHistory();"
+                                            :class="{'bg-brand-orange text-white font-bold': elements[selectedElementIndex].align === 'center', 'text-gray-400': elements[selectedElementIndex].align !== 'center'}"
+                                            class="py-2 rounded text-center text-xs transition min-h-[36px] flex items-center justify-center">📑 Centre</button>
+                                    <button @click="elements[selectedElementIndex].align = 'right'; saveHistory();"
+                                            :class="{'bg-brand-orange text-white font-bold': elements[selectedElementIndex].align === 'right', 'text-gray-400': elements[selectedElementIndex].align !== 'right'}"
+                                            class="py-2 rounded text-center text-xs transition min-h-[36px] flex items-center justify-center">📝 Droite</button>
+                                </div>
                             </div>
                         </div>
-                        <button @click="elements.splice(selectedElementIndex, 1); selectedElementIndex = null"
-                            class="w-full py-1 bg-red-600/20 text-red-400 border border-red-500/30 font-semibold rounded hover:bg-red-600 hover:text-white transition text-[10px]">
-                            🗑️ Supprimer l'élément
+                    </template>
+
+                    {{-- Image Editing --}}
+                    <template x-if="elements[selectedElementIndex].type === 'image'">
+                        <div class="space-y-3">
+                            <label class="w-full py-3 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg border border-dashed border-gray-600 text-xs font-semibold transition text-center cursor-pointer flex items-center justify-center gap-2 min-h-[44px]">
+                                <span>📁 Remplacer l'image</span>
+                                <input type="file" accept="image/*" class="hidden" @change="handleFileUpload($event)">
+                            </label>
+
+                            <div>
+                                <label class="block text-gray-400 text-[10px] mb-1 font-semibold">Taille (Largeur x Hauteur)</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="number" x-model.number="elements[selectedElementIndex].width" @input="saveHistory()" class="bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-white text-xs min-h-[44px]" placeholder="Largeur">
+                                    <input type="number" x-model.number="elements[selectedElementIndex].height" @input="saveHistory()" class="bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-white text-xs min-h-[44px]" placeholder="Hauteur">
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    {{-- Action Buttons (Done + Delete) --}}
+                    <div class="flex items-center gap-2 pt-2 border-t border-gray-800">
+                        <button @click="deleteSelectedElement()"
+                            class="flex-1 py-2.5 bg-red-600/20 text-red-400 border border-red-500/30 font-semibold rounded-lg hover:bg-red-600 hover:text-white transition text-xs flex items-center justify-center gap-1.5 min-h-[44px]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            <span>Supprimer</span>
+                        </button>
+                        <button @click="closeBottomSheet()"
+                            class="flex-1 py-2.5 bg-brand-orange text-white font-bold rounded-lg hover:bg-orange-600 transition text-xs min-h-[44px]">
+                            Terminé ✓
                         </button>
                     </div>
-                </template>
+                </div>
+            </template>
 
-                <template x-if="selectedElementIndex === null">
-                    <p class="text-center py-3 text-gray-500 italic text-[10px]">Sélectionnez un élément pour le modifier.</p>
-                </template>
-            </aside>
+            {{-- B. TOOL TABS CONTENT (WHEN NO ELEMENT IS SELECTED) --}}
+            <template x-if="selectedElementIndex === null">
+                <div>
+                    {{-- TEXT TAB --}}
+                    <div x-show="activeTab === 'text'" class="space-y-3">
+                        <div class="grid grid-cols-1 gap-2">
+                            <button @click="addText('Titre Principal')" class="py-3 px-3 bg-brand-orange hover:bg-orange-600 text-white font-bold rounded-lg transition text-left text-xs min-h-[44px] flex items-center justify-between">
+                                <span>+ Ajouter un grand titre</span>
+                                <span class="text-xs opacity-80">Aa</span>
+                            </button>
+                            <button @click="addText('Sous-titre explicatif')" class="py-3 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold rounded-lg border border-gray-700 transition text-left text-xs min-h-[44px] flex items-center justify-between">
+                                <span>+ Ajouter un sous-titre</span>
+                                <span class="text-xs opacity-60">Aa</span>
+                            </button>
+                            <button @click="addText('Texte de corps')" class="py-3 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 font-normal rounded-lg border border-gray-700 transition text-left text-xs min-h-[44px] flex items-center justify-between">
+                                <span>+ Ajouter un paragraphe</span>
+                                <span class="text-[10px] opacity-50">Aa</span>
+                            </button>
+                        </div>
+                    </div>
 
-        </div>{{-- end subpanel+canvas+props flex --}}
-    </div>{{-- end workspace flex --}}
+                    {{-- IMAGES TAB --}}
+                    <div x-show="activeTab === 'images'" class="space-y-3">
+                        <label class="w-full py-4 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg border border-dashed border-gray-600 text-xs font-semibold transition text-center cursor-pointer flex flex-col items-center justify-center gap-1.5 min-h-[60px]">
+                            <svg class="w-6 h-6 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>Choisir une image depuis votre téléphone</span>
+                            <input type="file" accept="image/*" class="hidden" @change="handleFileUpload($event)">
+                        </label>
+                    </div>
+
+                    {{-- SHAPES TAB --}}
+                    <div x-show="activeTab === 'shapes'" class="space-y-3">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button @click="addShape('rect')" class="py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg border border-gray-700 text-xs font-semibold text-center min-h-[44px]">⬛ Rectangle</button>
+                            <button @click="addShape('circle')" class="py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg border border-gray-700 text-xs font-semibold text-center min-h-[44px]">🔴 Cercle</button>
+                            <button @click="addShape('line')" class="py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg border border-gray-700 text-xs font-semibold text-center min-h-[44px]">➖ Ligne</button>
+                            <button @click="addShape('star')" class="py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg border border-gray-700 text-xs font-semibold text-center min-h-[44px]">⭐ Étoile</button>
+                        </div>
+                    </div>
+
+                    {{-- BACKGROUND TAB --}}
+                    <div x-show="activeTab === 'bg'" class="space-y-3">
+                        <label class="block text-gray-400 text-[10px] font-semibold uppercase tracking-wider">Couleur du support</label>
+                        <div class="grid grid-cols-5 gap-2">
+                            <button @click="canvasBg = '#ffffff'; saveHistory();" class="h-10 rounded-lg bg-white border border-gray-400 focus:ring-2 focus:ring-amber-400" title="Blanc"></button>
+                            <button @click="canvasBg = '#18181b'; saveHistory();" class="h-10 rounded-lg bg-stone-900 border border-gray-700 focus:ring-2 focus:ring-amber-400" title="Noir"></button>
+                            <button @click="canvasBg = '#fef3c7'; saveHistory();" class="h-10 rounded-lg bg-amber-100 border border-amber-300 focus:ring-2 focus:ring-amber-400" title="Ivoire"></button>
+                            <button @click="canvasBg = '#ecfdf5'; saveHistory();" class="h-10 rounded-lg bg-emerald-50 border border-emerald-300 focus:ring-2 focus:ring-amber-400" title="Menthe"></button>
+                            <button @click="canvasBg = '#fef2f2'; saveHistory();" class="h-10 rounded-lg bg-rose-50 border border-rose-300 focus:ring-2 focus:ring-amber-400" title="Rose"></button>
+                        </div>
+                        <div class="pt-2">
+                            <label class="block text-gray-400 text-[10px] mb-1">Couleur sur-mesure</label>
+                            <input type="color" x-model="canvasBg" @change="saveHistory()" class="w-full h-10 bg-gray-950 border border-gray-700 rounded-lg p-1 cursor-pointer">
+                        </div>
+                    </div>
+
+                    {{-- MORE TAB (ADVANCED PRODUCTION CONTROLS) --}}
+                    <div x-show="activeTab === 'more'" class="space-y-3">
+                        <div class="bg-gray-950 p-3 rounded-lg border border-gray-800 space-y-3">
+                            {{-- Zoom Control --}}
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-300 font-semibold">Niveau de Zoom</span>
+                                <div class="flex items-center bg-gray-900 px-2 py-1 rounded-lg border border-gray-700 text-xs">
+                                    <button @click="zoom = Math.max(zoom - 10, 50)" class="px-2 text-amber-400 font-bold text-sm">−</button>
+                                    <span class="w-10 text-center text-white font-bold" x-text="zoom + '%'"></span>
+                                    <button @click="zoom = Math.min(zoom + 10, 200)" class="px-2 text-amber-400 font-bold text-sm">+</button>
+                                </div>
+                            </div>
+
+                            {{-- Bleed Lines Toggle --}}
+                            <div class="flex items-center justify-between pt-2 border-t border-gray-800">
+                                <span class="text-xs text-gray-300 font-semibold">Repères de coupe (3mm)</span>
+                                <button @click="showBleedLines = !showBleedLines"
+                                    :class="{'bg-brand-orange text-white': showBleedLines, 'bg-gray-800 text-gray-400': !showBleedLines}"
+                                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                    <span x-text="showBleedLines ? 'ACTIVÉ' : 'DESACTIVÉ'"></span>
+                                </button>
+                            </div>
+
+                            {{-- CMJN Badge --}}
+                            <div class="flex items-center justify-between pt-2 border-t border-gray-800">
+                                <span class="text-xs text-gray-300 font-semibold">Mode d'impression</span>
+                                <span class="bg-green-500/20 text-green-400 text-xs font-mono px-2.5 py-1 rounded-lg border border-green-500/30 font-bold">Vectoriel CMJN 300DPI</span>
+                            </div>
+
+                            {{-- PDF BAT Download --}}
+                            <button @click="downloadProof()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-lg border border-gray-700 text-xs flex items-center justify-center gap-2 min-h-[44px] mt-2">
+                                <span>📥 Télécharger l'épreuve PDF BAT</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
 
 </main>
 
@@ -209,26 +599,210 @@ function graphicEditor() {
         templateName: 'Faire-part & Carte Luxe',
         zoom: 100,
         showBleedLines: true,
+        previewMode: false,
         activeTab: 'text',
         canvasBg: '#ffffff',
-        selectedElementIndex: 0,
+        selectedElementIndex: null,
+        showBottomSheet: false,
+
+        history: [],
+        historyIndex: -1,
 
         elements: [
-            { content: 'Shri Bharathi Press', x: 20, y: 25, size: 20, color: '#18181b', font: "'Dancing Script', cursive" },
-            { content: 'IMPRESSION & SIGNALÉTIQUE', x: 15, y: 65, size: 10, color: '#d97706', font: "'Montserrat', sans-serif" },
-            { content: 'www.shri-bharathi.fr', x: 25, y: 110, size: 9, color: '#71717a', font: "'Montserrat', sans-serif" }
+            { id: 1, type: 'text', content: 'Shri Bharathi Press', x: 25, y: 25, size: 22, color: '#18181b', font: "'Dancing Script', cursive", align: 'center' },
+            { id: 2, type: 'text', content: 'IMPRESSION & SIGNALÉTIQUE', x: 20, y: 70, size: 10, color: '#d97706', font: "'Montserrat', sans-serif", align: 'center' },
+            { id: 3, type: 'text', content: 'www.shri-bharathi-app.fr', x: 30, y: 110, size: 9, color: '#71717a', font: "'Montserrat', sans-serif", align: 'center' }
         ],
 
+        availableFonts: [
+            { name: 'Montserrat', family: "'Montserrat', sans-serif" },
+            { name: 'Dancing Script', family: "'Dancing Script', cursive" },
+            { name: 'Playfair Display', family: "'Playfair Display', serif" },
+            { name: 'Roboto', family: "'Roboto', sans-serif" },
+            { name: 'Inter', family: "'Inter', sans-serif" },
+            { name: 'Outfit', family: "'Outfit', sans-serif" }
+        ],
+
+        colorSwatches: ['#18181b', '#d97706', '#dc2626', '#2563eb', '#059669', '#7c3aed', '#ffffff'],
+
+        init() {
+            this.saveHistory();
+        },
+
+        saveHistory() {
+            if (this.historyIndex < this.history.length - 1) {
+                this.history = this.history.slice(0, this.historyIndex + 1);
+            }
+            this.history.push(JSON.stringify({
+                elements: this.elements,
+                canvasBg: this.canvasBg
+            }));
+            this.historyIndex = this.history.length - 1;
+        },
+
+        undo() {
+            if (this.historyIndex > 0) {
+                this.historyIndex--;
+                const state = JSON.parse(this.history[this.historyIndex]);
+                this.elements = state.elements;
+                this.canvasBg = state.canvasBg;
+                this.selectedElementIndex = null;
+            }
+        },
+
+        redo() {
+            if (this.historyIndex < this.history.length - 1) {
+                this.historyIndex++;
+                const state = JSON.parse(this.history[this.historyIndex]);
+                this.elements = state.elements;
+                this.canvasBg = state.canvasBg;
+                this.selectedElementIndex = null;
+            }
+        },
+
+        selectElement(index) {
+            this.selectedElementIndex = index;
+            if (window.innerWidth < 1024) {
+                this.showBottomSheet = true;
+            }
+        },
+
+        deselectElement() {
+            this.selectedElementIndex = null;
+            if (window.innerWidth < 1024 && !this.activeTab) {
+                this.showBottomSheet = false;
+            }
+        },
+
+        openTab(tabName) {
+            if (this.activeTab === tabName && this.showBottomSheet && this.selectedElementIndex === null) {
+                if (window.innerWidth < 1024) {
+                    this.showBottomSheet = false;
+                    return;
+                }
+            }
+            this.activeTab = tabName;
+            this.selectedElementIndex = null;
+            this.showBottomSheet = true;
+        },
+
+        closeBottomSheet() {
+            this.showBottomSheet = false;
+            this.selectedElementIndex = null;
+        },
+
         addText(str) {
+            let size = 14;
+            if (str === 'Titre Principal') size = 20;
+            if (str === 'Sous-titre explicatif') size = 12;
+
             this.elements.push({
+                id: Date.now(),
+                type: 'text',
                 content: str,
-                x: 20 + (this.elements.length * 6),
-                y: 35 + (this.elements.length * 15),
-                size: 14,
+                x: 20 + (this.elements.length * 5),
+                y: 35 + (this.elements.length * 12),
+                size: size,
                 color: '#18181b',
-                font: "'Montserrat', sans-serif"
+                font: "'Montserrat', sans-serif",
+                align: 'center'
             });
-            this.selectedElementIndex = this.elements.length - 1;
+            this.saveHistory();
+            this.selectElement(this.elements.length - 1);
+        },
+
+        addShape(shapeType) {
+            this.elements.push({
+                id: Date.now(),
+                type: 'shape',
+                shape: shapeType,
+                x: 40 + (this.elements.length * 5),
+                y: 40 + (this.elements.length * 5),
+                width: 60,
+                height: 40,
+                color: '#d97706'
+            });
+            this.saveHistory();
+            this.selectElement(this.elements.length - 1);
+        },
+
+        deleteSelectedElement() {
+            if (this.selectedElementIndex !== null) {
+                this.elements.splice(this.selectedElementIndex, 1);
+                this.selectedElementIndex = null;
+                this.saveHistory();
+                if (window.innerWidth < 1024) {
+                    this.showBottomSheet = false;
+                }
+            }
+        },
+
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.elements.push({
+                        id: Date.now(),
+                        type: 'image',
+                        src: e.target.result,
+                        x: 40,
+                        y: 30,
+                        width: 80,
+                        height: 80
+                    });
+                    this.saveHistory();
+                    this.selectElement(this.elements.length - 1);
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+
+        // Dragging elements on canvas
+        isDragging: false,
+        dragIndex: null,
+        dragStartX: 0,
+        dragStartY: 0,
+        elemStartX: 0,
+        elemStartY: 0,
+
+        startDrag(e, index) {
+            this.selectElement(index);
+            this.isDragging = true;
+            this.dragIndex = index;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            this.dragStartX = clientX;
+            this.dragStartY = clientY;
+            this.elemStartX = this.elements[index].x;
+            this.elemStartY = this.elements[index].y;
+
+            const onMove = (moveEv) => {
+                if (!this.isDragging || this.dragIndex === null) return;
+                const curX = moveEv.touches ? moveEv.touches[0].clientX : moveEv.clientX;
+                const curY = moveEv.touches ? moveEv.touches[0].clientY : moveEv.clientY;
+                const dx = curX - this.dragStartX;
+                const dy = curY - this.dragStartY;
+                this.elements[this.dragIndex].x = Math.max(0, Math.min(260, this.elemStartX + dx));
+                this.elements[this.dragIndex].y = Math.max(0, Math.min(180, this.elemStartY + dy));
+            };
+
+            const onEnd = () => {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.dragIndex = null;
+                    this.saveHistory();
+                }
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onEnd);
+                window.removeEventListener('touchmove', onMove);
+                window.removeEventListener('touchend', onEnd);
+            };
+
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+            window.addEventListener('touchmove', onMove, { passive: true });
+            window.addEventListener('touchend', onEnd);
         },
 
         downloadProof() {
